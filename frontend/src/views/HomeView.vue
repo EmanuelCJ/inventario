@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import ProductolistComponent from '@/components/productolistComponent.vue';
 </script>
 
 <template>
+  <h1>Inventario Sistema</h1>
   <main>
-    <TheWelcome />
+    <ProductolistComponent />
   </main>
 </template>
