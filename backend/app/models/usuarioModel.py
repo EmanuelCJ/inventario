@@ -3,7 +3,7 @@ class UsuarioModel:
     nombre: str
     apellido: str
     rol: str
-    contrasena: str
+    _contrasena: str
 
     def __init__(self, id_usuario: int, nombre: str, apellido: str, rol: str, contrasena: str):
         self.id_usuario = id_usuario
