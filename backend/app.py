@@ -9,6 +9,6 @@ if __name__ == "__main__":
 def home():
     return "Hello, Flask!"
 
-@app.route('/saludo/<int:usario_id>')
+@app.route('/<int:usario_id>')
 def saludo(usario_id):
     return f"Hola, {usario_id}!"
