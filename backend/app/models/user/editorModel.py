@@ -1,4 +1,4 @@
-from .usuarioModel import UsuarioModel
+from ..usuarioModel import UsuarioModel
 
 class editor (UsuarioModel):
     
