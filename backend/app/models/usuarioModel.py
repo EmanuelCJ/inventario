@@ -12,25 +12,23 @@ class UsuarioModel:
         self.rol = rol
         self.contrasena = contrasena
 
-    def __getID__(self):
+    def _get_ID(self):
         return self.id_usuario
     
-    def __getNombre__(self):
+    def _get_nombre(self):
         return self.nombre
     
-    def __getApellido__(self):
+    def _get_apellido(self):
         return self.apellido
     
-    def __getRol__(self):
+    def _get_Rol(self):
         return self.rol
-    
 
+    def _set_Rol(self, rol: str):
+        self.rol = rol
+     
+    def _get_contrasena(self):
+        return self.contrasena
 
-usuario = UsuarioModel(1, "Juan", "Perez", "admin", "password123")  # Ejemplo de instancia
-
-print(usuario.__getNombre__())  # Llamada al método para obtener el nombre
-
-    
-
-
-
+    def _set_contrasena(self, contrasena: str):
+        self.contrasena = contrasena
