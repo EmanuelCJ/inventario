@@ -1,12 +1,14 @@
+from db.conexionDB import get_connection
+
 
 class movimientosModel:
     
-    def __init__(self, id_movimiento: int, tipo: str, cantidad: int, fecha: str, id_producto: int, id_usuario: int):
+    def __init__(self, id_movimiento: int, tipo: str, cantidad: int, fecha: str, id_producto: int, id_usuario: int = None):
         self.id_movimiento = id_movimiento
         self.tipo = tipo
         self.cantidad = cantidad
         self.fecha = fecha
-        self.id_producto = id_producto
+        #foreign keys de la relacion
         self.id_usuario = id_usuario
 
     def get_ID(self):
