@@ -11,7 +11,7 @@ class productoModel:
         self.id_categoria = id_categoria
         self.id_movimiento = id_movimiento
 
-    def serializar(self):
+    def serializar(self) -> dict:
         return {
             "id_producto": self.id_producto,
             "nombre": self.nombre,
@@ -22,7 +22,7 @@ class productoModel:
             "id_movimiento": self.id_movimiento
         }
     
-    def deserializar(self, data):
+    def deserializar(self, data: dict):
         return data(
             id_producto = data.get("id_producto"),
             nombre = data.get("nombre"),
