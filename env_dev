@@ -1,0 +1,10 @@
+
+# Varias variables de entorno para una aplicación Flask que utiliza una base de datos MySQL.
+DB_USER=nombre_usuario
+DB_PASSWORD=contraseña_segura
+DB_HOST=localhost
+DB_NAME=mi_base_de_datos
+DB_PORT=puerto
+
+FLASK_APP=app.py
+FLASK_ENV=development
