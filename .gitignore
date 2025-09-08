@@ -7,4 +7,4 @@ frontend/.env
 __pycache__/
 *.pyc
 Backend/.venv/
-.env
+Backend/.env

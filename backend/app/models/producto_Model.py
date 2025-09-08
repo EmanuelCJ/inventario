@@ -44,4 +44,26 @@ class productoModel:
         cursor.close()
         connection.close()
         return cursor.lastrowid
-    
+
+    @staticmethod
+    def get_all_productos():
+        connection = get_connection()
+        
+        #diccionario para obtener los nombres de las columnas
+        with connection.cursor(dictionary=True) as cursor:
+            try:
+                #ejecutar la consulta SQL para obtener todos los productos
+                cursor.execute("SELECT * FROM producto")
+                
+                #guardar los resultados en una variable
+                rows = cursor.fetchall()
+
+                #lista para almacenar los productos
+                productos = []
+                for row in rows:
+                    productos.append(row)
+                    
+                return productos
+            except Exception as e:
+                print(f"Error al ejecutar la consulta: {e}")
+                return []

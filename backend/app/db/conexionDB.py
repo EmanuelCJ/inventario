@@ -1,9 +1,14 @@
+#nos permite conectarnos a la base de datos MySQL
 from mysql.connector import connect, Error
+#nos permite cargar variables de entorno desde un archivo .env
 import os
+#cargar las variables de entorno desde el archivo .env
 from dotenv import load_dotenv
 
+# Cargar las variables de entorno desde el archivo .env
 load_dotenv()
 
+@staticmethod
 def get_connection():
     try:
         connection = connect(

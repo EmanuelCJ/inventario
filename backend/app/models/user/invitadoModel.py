@@ -1,4 +1,4 @@
-from ..usuarioModel import UsuarioModel
+from ..usuario_Model import UsuarioModel
 
 class invitado (UsuarioModel):
     
