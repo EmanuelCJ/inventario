@@ -32,42 +32,7 @@ class productoModel:
             id_categoria = data.get("id_categoria"),
             id_movimiento = data.get("id_movimiento")
         )
-
-    #crear un nuevo producto nuevo
-    def create_producto(self):
-        connection = get_connection()
-        cursor = connection.cursor()
-        query = "INSERT INTO producto (nombre, descripcion, precio, cantidad, id_categoria) VALUES (%s, %s, %s, %s, %s)"
-        values = (self.nombre, self.descripcion, self.precio, self.cantidad, self.id_categoria)
-        cursor.execute(query, values)
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return cursor.lastrowid
-
-    @staticmethod
-    def get_all_productos():
-        connection = get_connection()
-        
-        #diccionario para obtener los nombres de las columnas
-        with connection.cursor(dictionary=True) as cursor:
-            try:
-                #ejecutar la consulta SQL para obtener todos los productos
-                cursor.execute("SELECT * FROM producto")
-                
-                #guardar los resultados en una variable
-                rows = cursor.fetchall()
-
-                #lista para almacenar los productos
-                productos = []
-                for row in rows:
-                    productos.append(row)
-                    
-                return productos
-            except Exception as e:
-                print(f"Error al ejecutar la consulta: {e}")
-                return []
-
+    
     def create(self, data):
         conn = get_connection()
         cursor = conn.cursor()
@@ -76,7 +41,7 @@ class productoModel:
         conn.commit()
         cursor.close()
         conn.close()
-
+    
     def read(self, producto_id):
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
@@ -105,5 +70,3 @@ class productoModel:
         cursor.close()
         conn.close()
     
-    def put(self, data):
-        pass

@@ -11,15 +11,32 @@ class movimientosModel:
         #foreign keys de la relacion
         self.__id_usuario = id_usuario
 
+    # Getters and Setters
+    def get_id_movimiento(self) -> int:
+        return self.__id_movimiento
+
+    def get_tipo(self) -> str:
+        return self.__tipo
+    
+    def get_cantidad(self) -> int:
+        return self.__cantidad
+
+    def get_fecha(self) -> str:
+        return self.__fecha
+
+    def get_id_usuario(self) -> int:
+        return self.__id_usuario
+    
 
     def serializar(self) -> dict:
         return {
-            "id_movimiento": self.id_movimiento,
-            "tipo": self.tipo,
-            "cantidad": self.cantidad,
-            "fecha": self.fecha,
-            "id_usuario": self.id_usuario
+            "id_movimiento": self.get_id_movimiento(),
+            "tipo": self.get_tipo(),
+            "cantidad": self.get_cantidad(),
+            "fecha": self.get_fecha(),
+            "id_usuario": self.get_id_usuario()
         }
+    
     def deserializar(self, data: dict):
         return data(
             id_movimiento = data.get("id_movimiento"),
@@ -30,20 +47,20 @@ class movimientosModel:
         )
     
     @staticmethod
-    def validar_rol_permisos(self, usuario, data: str):
-        if isinstance(usuario, object) and isinstance(data, str):
-            if validar_permiso(usuario , data):
+    def validar_rol_permisos(usuario, accion: str):
+        if isinstance(usuario, int) and isinstance(accion, str):
+            if validar_permiso(usuario , accion):
                 return True
         return False
     
     @staticmethod
-    def registrar_movimiento(self, usuario, tipo, cantidad, id_producto, id_lugar):
-        if self.validar_rol_permisos(usuario, "crear_movimiento"):
+    def registrar_movimiento(self, id_usuario, tipo, cantidad, id_producto, id_lugar):
+        if self.validar_rol_permisos(id_usuario, "crear_movimiento"):
             try:
                 conn = get_connection()
                 with conn.cursor() as cursor:
                     cursor.execute("INSERT INTO movimientos (tipo, cantidad, id_producto, id_usuario, id_lugar) VALUES (%s, %s, %s, %s, %s)",
-                                   (tipo, cantidad, id_producto, usuario.id_usuario, id_lugar))
+                                   (tipo, cantidad, id_producto, id_usuario, id_lugar))
                     conn.commit()
                     return True
             except Exception as e:
