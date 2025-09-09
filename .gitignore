@@ -1,10 +1,11 @@
 # Frontend
 frontend/node_modules/
 frontend/dist/
-frontend/.env
 
 # Backend
 __pycache__/
 *.pyc
-backendackend/.venv/
-backend/.env
+backend/.venv/
+
+# Ignorar todos los .env
+*.env
