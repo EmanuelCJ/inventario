@@ -2,14 +2,14 @@ from db.conexionDB import get_connection
 
 class productoModel:
     def __init__(self, id_producto: int, nombre: str, descripcion: str, precio: float, cantidad: int, id_categoria: int = None, id_movimiento: int = None):
-        self.id_producto = id_producto
-        self.nombre = nombre
-        self.descripcion = descripcion
-        self.precio = precio
-        self.cantidad = cantidad
+        self.__id_producto = id_producto
+        self.__nombre = nombre
+        self.__descripcion = descripcion
+        self.__precio = precio
+        self.__cantidad = cantidad
         #atributos de la relacion
-        self.id_categoria = id_categoria
-        self.id_movimiento = id_movimiento
+        self.__id_categoria = id_categoria
+        self.__id_movimiento = id_movimiento
 
     def serializar(self) -> dict:
         return {
@@ -67,3 +67,43 @@ class productoModel:
             except Exception as e:
                 print(f"Error al ejecutar la consulta: {e}")
                 return []
+
+    def create(self, data):
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = "INSERT INTO productos (nombre, descripcion, stock) VALUES (%s, %s, %s)"
+        cursor.execute(query, (data["nombre"], data["descripcion"], data["stock"]))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    def read(self, producto_id):
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+        query = "SELECT * FROM productos WHERE id=%s"
+        cursor.execute(query, (producto_id,))
+        producto = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return producto
+    
+    def update(self, producto_id, data):
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = "UPDATE productos SET stock=%s WHERE id=%s"
+        cursor.execute(query, (data["stock"], producto_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    def delete(self, producto_id):
+        conn = get_connection()
+        cursor = conn.cursor()
+        query = "DELETE FROM productos WHERE id=%s"
+        cursor.execute(query, (producto_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+    
+    def put(self, data):
+        pass

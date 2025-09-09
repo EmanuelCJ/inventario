@@ -29,8 +29,6 @@ class movimientosModel:
             id_usuario = data.get("id_usuario")
         )
     
-
-    
     @staticmethod
     def validar_rol_permisos(self, usuario, data: str):
         if isinstance(usuario, object) and isinstance(data, str):
@@ -39,7 +37,7 @@ class movimientosModel:
         return False
     
     @staticmethod
-    def registrar_movimiento(self,usuario, tipo, cantidad, id_producto, id_lugar):
+    def registrar_movimiento(self, usuario, tipo, cantidad, id_producto, id_lugar):
         if self.validar_rol_permisos(usuario, "crear_movimiento"):
             try:
                 conn = get_connection()
@@ -55,16 +53,3 @@ class movimientosModel:
                 if conn:
                     conn.close()
         return False
-    
-    def create_producto(self, usuario):
-        if self.validar_rol_permisos(self, usuario, "crear_producto"):
-            pass
-    def put_producto(self, usuario):
-        if self.validar_rol_permisos(self, usuario, "editar_producto"):
-            pass
-    def delete_producto(self, usuario):
-        if self.validar_rol_permisos(self, usuario, "eliminar_producto"):
-            pass
-    def update_producto(self, usuario):
-        if self.validar_rol_permisos(self, usuario, "editar_producto"):
-            pass
