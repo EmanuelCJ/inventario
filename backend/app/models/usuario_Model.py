@@ -1,6 +1,7 @@
-from app.db.conexionDB import get_connection
+from ..db.conexion_DB import ConectDB
 from ..utils.validation_rol import validar_permiso
-from app.models.movimiento_Model import movimientosModel
+from app.models.producto_Model import productoModel
+from app.models.movimiento_Model import movimientos_model
 
 class usuario_model:
 
@@ -68,61 +69,87 @@ class usuario_model:
     
         
     def create_usuario(self):
-        connection = get_connection()
-        cursor = connection.cursor()
-        query = "INSERT INTO usuario (nombre, apellido, rol, contrasena) VALUES (%s, %s, %s, %s)"
-        values = (self.nombre, self.apellido, self.rol, self.contrasena)
-        cursor.execute(query, values)
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return cursor.lastrowid
-
+        connection = ConectDB.get_connection()
+        with connection.cursor() as cursor:
+            try:
+                query = "INSERT INTO usuario (nombre, apellido, rol, contrasena) VALUES (%s, %s, %s, %s)"
+                values = (self.get_nombre(), self.get_apellido(), self.get_rol(), self.get_contrasena())
+                cursor.execute(query, values)
+                return True
+            except Exception as e:
+                print(f"Error creating user: {e}")
+                return None
+                
+       
+    def read_usuario(self):
+        connection = ConectDB.get_connection()
+        with connection.cursor() as cursor:
+            try:
+                query = "INSERT INTO usuario (nombre, apellido, rol, contrasena) VALUES (%s, %s, %s, %s)"
+                values = (self.get_nombre(), self.get_apellido(), self.get_rol(), self.get_contrasena())
+                cursor.execute(query, values)
+                return True
+            except Exception as e:
+                print(f"Error creating user: {e}")
+                return None
+            
     def read(self, usuario_id):
-        connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
-        query = "SELECT * FROM usuario WHERE id_usuario=%s"
-        values = (usuario_id,)
-        cursor.execute(query, values)
-        row = cursor.fetchone()
-        cursor.close()
-        connection.close()
-        if row:
-            return usuario_model(
-                id_usuario=row["id_usuario"],
-                nombre=row["nombre"],
-                apellido=row["apellido"],
-                rol=row["rol"],
-                contrasena=row["contrasena"]
-            )
-        return None
+        connection = ConectDB.get_connection()
+        with connection.cursor() as cursor:
+            try:
+                cursor = connection.cursor()
+                query = "SELECT id_usuario, nombre, apellido, rol, contrasena FROM usuario WHERE id_usuario = %s"
+                cursor.execute(query, (usuario_id,))
+                result = cursor.fetchone()
+                cursor.close()
+                connection.close()
+                if result:
+                    return {
+                    "id_usuario": result[0],
+                    "nombre": result[1],
+                    "apellido": result[2],
+                    "rol": result[3],
+                    "contrasena": result[4]
+                    }
+                return None
+            except Exception as e:
+                print(f"Error reading user: {e}")
+                return None
+
     
     def update_usuario(self, usuario_id, data):
-        connection = get_connection()
-        cursor = connection.cursor()
-        query = "UPDATE usuario SET nombre=%s, apellido=%s, rol=%s, contrasena=%s WHERE id_usuario=%s"
-        values = (data.get("nombre"), data.get("apellido"), data.get("rol"), data.get("contrasena"), usuario_id)
-        cursor.execute(query, values)
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return True
+        try:
+            connection = ConectDB.get_connection()
+            cursor = connection.cursor()
+            query = "UPDATE usuario SET nombre=%s, apellido=%s, rol=%s, contrasena=%s WHERE id_usuario=%s"
+            values = (data["nombre"], data["apellido"], data["rol"], data["contrasena"], usuario_id)
+            cursor.execute(query, values)
+            connection.commit()
+            cursor.close()
+            connection.close()
+            return True
+        except Exception as e:
+            print(f"Error updating user: {e}")
+            return False
     
     def delete_usuario(self, usuario_id):
-        connection = get_connection()
-        cursor = connection.cursor()
-        query = "DELETE FROM usuario WHERE id_usuario=%s"
-        values = (usuario_id,)
-        cursor.execute(query, values)
-        connection.commit()
-        cursor.close()
-        connection.close()
-        return True
+        try:
+            connection = ConectDB.get_connection()
+            cursor = connection.cursor()
+            query = "DELETE FROM usuario WHERE id_usuario=%s"
+            cursor.execute(query, (usuario_id,))
+            connection.commit()
+            cursor.close()
+            connection.close()
+            return True
+        except Exception as e:
+            print(f"Error deleting user: {e}")
+            return False
 
     # funciones del usuarioModel para usar movimientoModel y que afecten a productos
-    def crear_producto(self):
+    def crear_producto(self, usuario: object , data: dict):
         #debemos saber si el usuario tiene permisos para crear productos
-        if not validar_permiso(self, "crear_producto"):
-           movimientosModel.registrar_movimiento(self.get_id_usuario(), "crear_producto", 0, 0, 0)
-
-           pass
+        if not validar_permiso(self, usuario, "crear_producto"):
+            respuesta = productoModel.create(self, data)
+            movimientos_model.registrar_movimiento(self, usuario, "creacion", data.get("cantidad"), respuesta, None)
+        return False

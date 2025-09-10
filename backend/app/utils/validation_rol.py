@@ -7,6 +7,6 @@ PERMISOS = {
 }
 
 def validar_permiso(usuario, accion):
-    if accion in PERMISOS.get(usuario.rol, []):
+    if accion in PERMISOS.get(usuario.get_rol(), []):
         return True
     return False

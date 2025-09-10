@@ -1,7 +1,7 @@
-from db.conexionDB import get_connection
+from backend.app.db.conexion_DB import get_connection
 from ..utils.validation_rol import validar_permiso
 
-class movimientosModel:
+class movimientos_model:
     
     def __init__(self, id_movimiento: int, tipo: str, cantidad: int, fecha: str, id_producto: int, id_usuario: int = None):
         self.__id_movimiento = id_movimiento
@@ -54,13 +54,13 @@ class movimientosModel:
         return False
     
     @staticmethod
-    def registrar_movimiento(self, id_usuario, tipo, cantidad, id_producto, id_lugar):
-        if self.validar_rol_permisos(id_usuario, "crear_movimiento"):
+    def registrar_movimiento(self, usuario, tipo, cantidad, id_producto, id_lugar):
+        if self.validar_rol_permisos(usuario, "crear_movimiento"):
             try:
                 conn = get_connection()
                 with conn.cursor() as cursor:
-                    cursor.execute("INSERT INTO movimientos (tipo, cantidad, id_producto, id_usuario, id_lugar) VALUES (%s, %s, %s, %s, %s)",
-                                   (tipo, cantidad, id_producto, id_usuario, id_lugar))
+                    cursor.execute("INSERT INTO movimientos (tipo, cantidad, id_producto, usuario, id_lugar) VALUES (%s, %s, %s, %s, %s)",
+                                   (tipo, cantidad, id_producto, usuario.get_id_usuario(), id_lugar))
                     conn.commit()
                     return True
             except Exception as e:

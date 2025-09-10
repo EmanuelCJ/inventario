@@ -1,0 +1,200 @@
+-- Crear base de datos
+CREATE DATABASE IF NOT EXISTS inventario CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE inventario;
+
+-- Tabla de categorías
+CREATE TABLE categorias (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    descripcion TEXT,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_nombre (nombre)
+);
+
+-- Tabla de lugares
+CREATE TABLE lugares (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_nombre (nombre)
+);
+
+-- Tabla de usuarios
+CREATE TABLE usuarios (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL,
+    email VARCHAR(120) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    rol VARCHAR(50) DEFAULT 'usuario',
+    activo BOOLEAN DEFAULT TRUE,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_email (email),
+    INDEX idx_activo (activo)
+);
+
+-- Tabla de productos
+CREATE TABLE productos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(200) NOT NULL,
+    descripcion TEXT,
+    codigo VARCHAR(50) NOT NULL UNIQUE,
+    precio DECIMAL(10, 2),
+    cantidad INT DEFAULT 0,
+    cantidad_minima INT DEFAULT 0,
+    activo BOOLEAN DEFAULT TRUE,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    categoria_id INT NOT NULL,
+    lugar_id INT,
+    
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE RESTRICT,
+    FOREIGN KEY (lugar_id) REFERENCES lugares(id) ON DELETE SET NULL,
+    
+    INDEX idx_codigo (codigo),
+    INDEX idx_nombre (nombre),
+    INDEX idx_activo (activo),
+    INDEX idx_categoria (categoria_id),
+    INDEX idx_lugar (lugar_id),
+    INDEX idx_stock_bajo (cantidad, cantidad_minima)
+);
+
+-- Tabla de movimientos
+CREATE TABLE movimientos (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    tipo ENUM('entrada', 'salida', 'ajuste') NOT NULL,
+    cantidad INT NOT NULL,
+    cantidad_anterior INT NOT NULL,
+    cantidad_nueva INT NOT NULL,
+    motivo VARCHAR(200),
+    observaciones TEXT,
+    fecha_movimiento DATETIME DEFAULT CURRENT_TIMESTAMP,
+    producto_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    
+    FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE RESTRICT,
+    
+    INDEX idx_producto (producto_id),
+    INDEX idx_usuario (usuario_id),
+    INDEX idx_fecha (fecha_movimiento),
+    INDEX idx_tipo (tipo)
+);
+
+-- Insertar datos de ejemplo
+
+-- Categorías
+INSERT INTO categorias (nombre, descripcion) VALUES
+('Electrónicos', 'Dispositivos electrónicos y componentes'),
+('Oficina', 'Suministros de oficina y papelería'),
+('Limpieza', 'Productos de limpieza e higiene'),
+('Herramientas', 'Herramientas y equipos de trabajo');
+
+-- Lugares
+INSERT INTO lugares (nombre, descripcion) VALUES
+('Almacén Principal', 'Almacén central de la empresa'),
+('Oficina Administración', 'Oficina administrativa principal'),
+('Depósito Norte', 'Depósito secundario zona norte'),
+('Sala de Servidores', 'Sala de equipos informáticos');
+
+-- Usuario administrador (password: admin123)
+INSERT INTO usuarios (nombre, apellido, email, password_hash, rol) VALUES
+('Admin', 'Sistema', 'admin@empresa.com', 'pbkdf2:sha256:260000$8xGNpfJ8gYaY6lQs$8f5f9e2e7d1c9b8a6f4e3d2c1b0a9e8d7c6b5a4f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a0f', 'admin');
+
+-- Productos de ejemplo
+INSERT INTO productos (nombre, descripcion, codigo, precio, cantidad, cantidad_minima, categoria_id, lugar_id) VALUES
+('Laptop Dell Inspiron', 'Laptop para uso general', 'DELL001', 45000.00, 5, 2, 1, 1),
+('Mouse Inalámbrico', 'Mouse óptico inalámbrico', 'MSE001', 1500.00, 25, 5, 1, 1),
+('Papel A4', 'Resma de papel A4 500 hojas', 'PAP001', 350.00, 50, 10, 2, 2),
+('Detergente Líquido', 'Detergente para limpieza 1L', 'DET001', 280.00, 15, 5, 3, 1);
+
+-- Crear vista para productos con información completa
+CREATE VIEW vista_productos_completa AS
+SELECT 
+    p.*,
+    c.nombre as categoria_nombre,
+    l.nombre as lugar_nombre,
+    CASE WHEN p.cantidad <= p.cantidad_minima THEN 1 ELSE 0 END as stock_bajo,
+    (SELECT COUNT(*) FROM movimientos m WHERE m.producto_id = p.id) as total_movimientos
+FROM productos p
+LEFT JOIN categorias c ON p.categoria_id = c.id
+LEFT JOIN lugares l ON p.lugar_id = l.id;
+
+-- Crear vista para movimientos con información completa
+CREATE VIEW vista_movimientos_completa AS
+SELECT 
+    m.*,
+    p.nombre as producto_nombre,
+    p.codigo as producto_codigo,
+    CONCAT(u.nombre, ' ', u.apellido) as usuario_nombre,
+    c.nombre as categoria_nombre
+FROM movimientos m
+JOIN productos p ON m.producto_id = p.id
+JOIN usuarios u ON m.usuario_id = u.id
+JOIN categorias c ON p.categoria_id = c.id;
+
+-- Procedimiento almacenado para crear movimiento
+DELIMITER //
+
+CREATE PROCEDURE CrearMovimiento(
+    IN p_producto_id INT,
+    IN p_tipo ENUM('entrada', 'salida', 'ajuste'),
+    IN p_cantidad INT,
+    IN p_motivo VARCHAR(200),
+    IN p_usuario_id INT,
+    IN p_observaciones TEXT
+)
+BEGIN
+    DECLARE v_cantidad_actual INT;
+    DECLARE v_nueva_cantidad INT;
+    DECLARE v_cantidad_movimiento INT;
+    
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+    
+    START TRANSACTION;
+    
+    -- Obtener cantidad actual
+    SELECT cantidad INTO v_cantidad_actual 
+    FROM productos 
+    WHERE id = p_producto_id;
+    
+    -- Calcular nueva cantidad
+    CASE p_tipo
+        WHEN 'entrada' THEN
+            SET v_nueva_cantidad = v_cantidad_actual + p_cantidad;
+            SET v_cantidad_movimiento = p_cantidad;
+        WHEN 'salida' THEN
+            IF v_cantidad_actual < p_cantidad THEN
+                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Stock insuficiente';
+            END IF;
+            SET v_nueva_cantidad = v_cantidad_actual - p_cantidad;
+            SET v_cantidad_movimiento = p_cantidad;
+        WHEN 'ajuste' THEN
+            SET v_nueva_cantidad = p_cantidad;
+            SET v_cantidad_movimiento = ABS(p_cantidad - v_cantidad_actual);
+    END CASE;
+    
+    -- Insertar movimiento
+    INSERT INTO movimientos (
+        tipo, cantidad, cantidad_anterior, cantidad_nueva,
+        motivo, observaciones, producto_id, usuario_id
+    ) VALUES (
+        p_tipo, v_cantidad_movimiento, v_cantidad_actual, v_nueva_cantidad,
+        p_motivo, p_observaciones, p_producto_id, p_usuario_id
+    );
+    
+    -- Actualizar stock del producto
+    UPDATE productos 
+    SET cantidad = v_nueva_cantidad,
+        fecha_actualizacion = CURRENT_TIMESTAMP
+    WHERE id = p_producto_id;
+    
+    COMMIT;
+END//
+
+DELIMITER ;
