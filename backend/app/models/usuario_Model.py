@@ -83,12 +83,16 @@ class usuario_model:
        
     def read_usuario(self):
         connection = ConectDB.get_connection()
-        with connection.cursor() as cursor:
+        with connection.cursor(dictionary=True) as cursor:
             try:
                 query = "INSERT INTO usuario (nombre, apellido, rol, contrasena) VALUES (%s, %s, %s, %s)"
                 values = (self.get_nombre(), self.get_apellido(), self.get_rol(), self.get_contrasena())
                 cursor.execute(query, values)
-                return True
+                rows = cursor.fetchall()
+                productos = []
+                for row in rows:
+                    productos.append(row)
+                return productos   
             except Exception as e:
                 print(f"Error creating user: {e}")
                 return None
@@ -97,12 +101,9 @@ class usuario_model:
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
-                cursor = connection.cursor()
                 query = "SELECT id_usuario, nombre, apellido, rol, contrasena FROM usuario WHERE id_usuario = %s"
                 cursor.execute(query, (usuario_id,))
                 result = cursor.fetchone()
-                cursor.close()
-                connection.close()
                 if result:
                     return {
                     "id_usuario": result[0],
@@ -115,6 +116,9 @@ class usuario_model:
             except Exception as e:
                 print(f"Error reading user: {e}")
                 return None
+            finally:
+                if connection:
+                    connection.close()
 
     
     def update_usuario(self, usuario_id, data):
