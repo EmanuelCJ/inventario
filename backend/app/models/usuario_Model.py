@@ -1,4 +1,6 @@
 from ..db.conexion_DB import ConectDB
+from ..utils.generation_password import hash_password
+
 from ..utils.validation_rol import validar_permiso
 from app.models.producto_Model import productoModel
 from app.models.movimiento_Model import movimientos_model
@@ -6,11 +8,12 @@ from app.models.movimiento_Model import movimientos_model
 class usuario_model:
 
     def __init__(self, id_usuario: int, nombre: str, apellido: str, rol: str, contrasena: str):
+
         self.__id_usuario = id_usuario
         self.__nombre = nombre
         self.__apellido = apellido
         self.__rol = rol
-        self.__contrasena = contrasena
+        self.__contrasena = hash_password(contrasena)
 
     def get_id_usuario(self) -> int:
         return self.__id_usuario
@@ -67,7 +70,14 @@ class usuario_model:
             contrasena = data.get("contrasena")
         )
     
-        
+    """
+    CRUD Methods
+    Create, Read, Update, Delete
+    Estas funciones interactuan con la base de datos para realizar operaciones CRUD en la tabla usuario.
+    Cada metodo maneja excepciones y cierra la conexion a la base de datos adecuadamente.
+    """
+
+    @staticmethod
     def create_usuario(self):
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
@@ -79,8 +89,11 @@ class usuario_model:
             except Exception as e:
                 print(f"Error creating user: {e}")
                 return None
+            finally:
+                if connection:
+                    connection.close()
                 
-       
+    @staticmethod
     def read_usuario(self):
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
@@ -89,14 +102,18 @@ class usuario_model:
                 values = (self.get_nombre(), self.get_apellido(), self.get_rol(), self.get_contrasena())
                 cursor.execute(query, values)
                 rows = cursor.fetchall()
-                productos = []
+                usuarios = []
                 for row in rows:
-                    productos.append(row)
-                return productos   
+                    usuarios.append(row)
+                return usuarios   
             except Exception as e:
                 print(f"Error creating user: {e}")
                 return None
-            
+            finally:
+                if connection:
+                    connection.close()
+    
+    @staticmethod        
     def read(self, usuario_id):
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
@@ -120,40 +137,56 @@ class usuario_model:
                 if connection:
                     connection.close()
 
-    
+    @staticmethod
     def update_usuario(self, usuario_id, data):
-        try:
-            connection = ConectDB.get_connection()
-            cursor = connection.cursor()
-            query = "UPDATE usuario SET nombre=%s, apellido=%s, rol=%s, contrasena=%s WHERE id_usuario=%s"
-            values = (data["nombre"], data["apellido"], data["rol"], data["contrasena"], usuario_id)
-            cursor.execute(query, values)
-            connection.commit()
-            cursor.close()
-            connection.close()
-            return True
-        except Exception as e:
-            print(f"Error updating user: {e}")
-            return False
-    
-    def delete_usuario(self, usuario_id):
-        try:
-            connection = ConectDB.get_connection()
-            cursor = connection.cursor()
-            query = "DELETE FROM usuario WHERE id_usuario=%s"
-            cursor.execute(query, (usuario_id,))
-            connection.commit()
-            cursor.close()
-            connection.close()
-            return True
-        except Exception as e:
-            print(f"Error deleting user: {e}")
-            return False
+        connection = ConectDB.get_connection()
+        with connection.cursor() as cursor:
+            try:
+                query = "UPDATE usuario SET nombre=%s, apellido=%s, rol=%s, contrasena=%s WHERE id_usuario=%s"
+                values = (data["nombre"], data["apellido"], data["rol"], data["contrasena"], usuario_id)
+                cursor.execute(query, values)
+                return True
+            except Exception as e:
+                print(f"Error updating user: {e}")
+                return False
+            finally:
+                if connection:
+                    connection.close()
+
+    @staticmethod
+    def delete_usuario(self, usuario_id : int ):
+        connection = ConectDB.get_connection()
+        with connection.cursor() as cursor:
+            try:
+                query = "DELETE FROM usuario WHERE id_usuario=%s"
+                cursor.execute(query, (usuario_id,))
+                connection.commit()
+                return True
+            except Exception as e:
+                print(f"Error deleting user: {e}")
+                return False
+            finally:
+                if connection:
+                    connection.close()
+
+
+    """
+    Funciones adicionales del usuarioModel
+    Estas funciones permiten al usuario realizar acciones adicionales como crear productos.
+    Cada funcion valida si el usuario tiene los permisos necesarios antes de ejecutar la accion.
+    """
 
     # funciones del usuarioModel para usar movimientoModel y que afecten a productos
-    def crear_producto(self, usuario: object , data: dict):
+    def crear_producto(self, usuario : object , data: dict):
         #debemos saber si el usuario tiene permisos para crear productos
-        if not validar_permiso(self, usuario, "crear_producto"):
+        if not validar_permiso(self, self.get_id_usuario(), "crear_producto"):
             respuesta = productoModel.create(self, data)
             movimientos_model.registrar_movimiento(self, usuario, "creacion", data.get("cantidad"), respuesta, None)
         return False
+    
+
+usuario_model = usuario_model(0, "Emanuel", "castrillo", "admin", "miContrasena123")
+
+print(usuario_model.serializar())
+
+usuario_model.create_usuario()
