@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 
 # Cargar las variables de entorno desde el archivo .env
 load_dotenv()
-class ConectDB:
-    
+
+class ConectDB():
     @staticmethod
     def get_connection():
         try:
