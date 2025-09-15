@@ -12,7 +12,11 @@ class UsuarioDAO:
     """
 
     @staticmethod
-    def create_user(datos_user : dict) -> bool:
+    def create_user(usuario : object , datos_user : dict) -> bool:
+
+        if usuario.get_rol() != "admin":
+            raise PermissionError("No tienes permiso para crear un usuario")
+
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -67,7 +71,7 @@ class UsuarioDAO:
     @staticmethod
     def update_user(usuario: object, id_usuario : int, data: dict):
         
-        if usuario.get_rol() != 'admin':
+        if usuario.get_roll() != "admin" and usuario.get_roll() != "editor":
             raise PermissionError("No tienes permiso para modificar un usuario")
         
         connection = ConectDB.get_connection()
@@ -98,7 +102,7 @@ class UsuarioDAO:
     @staticmethod
     def delete_user(usuario: object, id_usuario : int ):
         
-        if usuario.get_rol() != 'admin':
+        if usuario.get_roll() != "admin" and usuario.get_roll() != "editor":
             raise PermissionError("No tienes permiso para eliminar un usuario")
         
         connection = ConectDB.get_connection()

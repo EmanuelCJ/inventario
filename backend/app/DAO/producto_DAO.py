@@ -12,7 +12,11 @@ class ProductoDAO:
     """
 
     @staticmethod
-    def create_product(datos_product : dict) -> bool:
+    def create_product(usuario: object,datos_product : dict) -> bool:
+
+        if usuario.get_rol() != 'admin' and usuario.get_rol() != 'editor':
+            raise PermissionError("No tienes permiso para crear un producto")
+
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -25,7 +29,7 @@ class ProductoDAO:
                 connection.commit()
                 return True
             except Exception as e:
-                print(f"Error creating user: {e}")
+                print(f"Error creating product: {e}")
                 return False
             finally:
                 connection.close()
@@ -44,7 +48,7 @@ class ProductoDAO:
                     product.append(row)
                 return product   
             except Exception as e:
-                print(f"Error creating user: {e}")
+                print(f"Error creating product: {e}")
                 return None
             finally:
                 connection.close()
@@ -58,7 +62,7 @@ class ProductoDAO:
                 cursor.execute(query, (product_id,))
                 return cursor.fetchone() #diccionario o None
             except Exception as e:
-                print(f"Error reading user: {e}")
+                print(f"Error reading product: {e}")
                 return None
             finally:
                 connection.close()
@@ -67,7 +71,7 @@ class ProductoDAO:
     @staticmethod
     def update_product(usuario: object, id_producto : int, data: dict):
         
-        if usuario.get_rol() != 'admin':
+        if usuario.get_rol() != 'admin' and usuario.get_rol() != 'editor':
             raise PermissionError("No tienes permiso para modificar un usuario")
         
         
@@ -91,7 +95,7 @@ class ProductoDAO:
                 connection.commit()  # importante para que se guarden los cambios
                 return cursor.rowcount > 0  # True si actualizó al menos 1 fila
             except Exception as e:
-                print(f"Error updating user: {e}")
+                print(f"Error updating product: {e}")
                 return False
             finally:
                 connection.close()
@@ -100,18 +104,18 @@ class ProductoDAO:
     @staticmethod
     def delete_product(usuario: object, id_product : int ):
         
-        if usuario.get_rol() != 'admin' or usuario.get_rol() != 'editor':
+        if usuario.get_rol() != 'admin' and usuario.get_rol() != 'editor':
             raise PermissionError("No tienes permiso para eliminar un producto")
         
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
-                query = "DELETE FROM usuarios WHERE id=%s"
+                query = "DELETE FROM producto WHERE id=%s"
                 cursor.execute(query, (id_product,))
                 connection.commit()
                 return True
             except Exception as e:
-                print(f"Error deleting user: {e}")
+                print(f"Error deleting product: {e}")
                 return False
             finally:
                 connection.close()
