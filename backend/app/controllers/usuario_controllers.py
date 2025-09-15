@@ -14,15 +14,29 @@ class UsuarioController:
         return ProductoDAO.create_product(Usuario, datos_product)
     
 
-user = UsuarioModel("Emanuel","Sanchez","admin","1234")
+"""
+
+este codigo de abajo debe borrarse se usa para ver si funciona
+
+"""
+
+
+user = UsuarioModel("Emanuel","Sanchez","editor","1234")
 
 nuevo = {
-    "nombre": "Eduardo",
-    "apellido": "Sanchez",
-    "rol": "editor",
-    "password_hash":  hash_password("1245")
+    "nombre": "Emanuel",
+    "apellido": "castrillo",
+    "rol": "admin",
+    "password_hash":  hash_password("miclave124")
 }
 
-respuesta = UsuarioController.create_user_controller(user, nuevo)
+producto = {
+    "nombre":"mouse",
+    "descripcion":"esto es una prueba",
+    "condicion": "nuevo", 
+    "cantidad": 10
+}
+
+respuesta = UsuarioController.create_product_controller(user, nuevo)
 
 print (respuesta)
