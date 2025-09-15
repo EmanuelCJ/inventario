@@ -1,0 +1,17 @@
+🔁 Solución recomendada: Usar un entorno virtual por sistema operativo
+Mantené dos entornos virtuales, uno para cada sistema:
+
+En Windows:
+powershell
+python -m venv venv_win
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+En Linux:
+bash
+
+python3 -m venv venv_linux
+source venv/bin/activate
+pip install -r requirements.txt
+
+Ambos entornos se llaman venv, pero son independientes. Podés ignorar uno cuando estás en el otro sistema.

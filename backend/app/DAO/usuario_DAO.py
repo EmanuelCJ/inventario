@@ -10,9 +10,9 @@ class UsuarioDAO:
     Estas funciones interactuan con la base de datos para realizar operaciones CRUD en la tabla usuario.
     Cada metodo maneja excepciones y cierra la conexion a la base de datos adecuadamente.
     """
+
     @staticmethod
-    def create_usuario(data : dict) -> bool:
-        
+    def create_user(datos_user : dict) -> bool:
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -20,7 +20,7 @@ class UsuarioDAO:
                     INSERT INTO usuarios (nombre, apellido, rol, password_hash)
                     VALUES (%s, %s, %s, %s)
                 """
-                values = (data.get_nombre(), data.get_apellido(), data.get_rol(), data.get_contrasena())
+                values = (datos_user.get("nombre"), datos_user.get("apellido"), datos_user.get("rol"), datos_user.get("password_hash"))
                 cursor.execute(query, values)
                 connection.commit()
                 return True
@@ -30,8 +30,9 @@ class UsuarioDAO:
             finally:
                 connection.close()
                 
-    @staticmethod  
-    def read_all(self):
+    @staticmethod
+    def read_all_user():
+
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
@@ -49,22 +50,13 @@ class UsuarioDAO:
                 connection.close()
                 
     @staticmethod
-    def read_one(self, usuario_id : int ):
+    def read_one_user(usuario_id : int):
         connection = ConectDB.get_connection()
-        with connection.cursor() as cursor:
+        with connection.cursor(dictionary=True) as cursor:
             try:
                 query = "SELECT id, nombre, apellido, rol, password_hash FROM usuarios WHERE id = %s"
                 cursor.execute(query, (usuario_id,))
-                result = cursor.fetchone()
-                if result:
-                    return {
-                    "id": result[0],
-                    "nombre": result[1],
-                    "apellido": result[2],
-                    "rol": result[3],
-                    "password_hash": result[4]
-                    }
-                return None
+                return cursor.fetchone() #diccionario o None
             except Exception as e:
                 print(f"Error reading user: {e}")
                 return None
@@ -73,9 +65,9 @@ class UsuarioDAO:
                 
 
     @staticmethod
-    def update_usuario(self, id_usuario: int, data: dict):
+    def update_user(usuario: object, id_usuario : int, data: dict):
         
-        if self.get_rol() != 'admin':
+        if usuario.get_rol() != 'admin':
             raise PermissionError("No tienes permiso para modificar un usuario")
         
         connection = ConectDB.get_connection()
@@ -89,13 +81,12 @@ class UsuarioDAO:
                 values = (
                     data["nombre"],
                     data["apellido"],
-                    data["email"],
                     data["rol"],
                     data["password_hash"],
                     id_usuario
                 )
                 cursor.execute(query, values)
-                connection.commit()  # 🔹 importante para que se guarden los cambios
+                connection.commit()  # importante para que se guarden los cambios
                 return cursor.rowcount > 0  # True si actualizó al menos 1 fila
             except Exception as e:
                 print(f"Error updating user: {e}")
@@ -105,9 +96,9 @@ class UsuarioDAO:
                 
                 
     @staticmethod
-    def delete_usuario(self, id_usuario : int ):
+    def delete_user(usuario: object, id_usuario : int ):
         
-        if self.get_rol() != 'admin':
+        if usuario.get_rol() != 'admin':
             raise PermissionError("No tienes permiso para eliminar un usuario")
         
         connection = ConectDB.get_connection()
