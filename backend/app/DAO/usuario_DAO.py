@@ -26,9 +26,11 @@ class UsuarioDAO:
                 """
                 values = (datos_user.get("nombre"), datos_user.get("apellido"), datos_user.get("rol"), datos_user.get("password_hash"))
                 cursor.execute(query, values)
+                id_nuevo = cursor.lastrowid() #devuelve el id
                 connection.commit()
                 return True
             except Exception as e:
+                connection.rollback()
                 print(f"Error creating user: {e}")
                 return False
             finally:
@@ -40,7 +42,7 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, nombre, apellido, rol, password_hash FROM usuarios"
+                query = "SELECT id, nombre, apellido, rol FROM usuarios"
                 cursor.execute(query,)
                 rows = cursor.fetchall()
                 usuarios = []
@@ -58,7 +60,7 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, nombre, apellido, rol, password_hash FROM usuarios WHERE id = %s"
+                query = "SELECT id, nombre, apellido, rol FROM usuarios WHERE id = %s"
                 cursor.execute(query, (usuario_id,))
                 return cursor.fetchone() #diccionario o None
             except Exception as e:
@@ -90,9 +92,10 @@ class UsuarioDAO:
                     id_usuario
                 )
                 cursor.execute(query, values)
-                connection.commit()  # importante para que se guarden los cambios
+                connection.commit()  # importante para que se guarden los cambios sino no se hacen efectivo
                 return cursor.rowcount > 0  # True si actualizó al menos 1 fila
             except Exception as e:
+                connection.rollback() #si falla deshace cambios
                 print(f"Error updating user: {e}")
                 return False
             finally:
@@ -113,6 +116,7 @@ class UsuarioDAO:
                 connection.commit()
                 return True
             except Exception as e:
+                connection.rollback()
                 print(f"Error deleting user: {e}")
                 return False
             finally:
