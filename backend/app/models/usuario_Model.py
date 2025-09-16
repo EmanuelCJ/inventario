@@ -45,7 +45,6 @@ class UsuarioModel:
 
     def serializar(self) -> dict:
         return {
-            "id_usuario": self.get_id_usuario(),
             "nombre": self.get_nombre(),
             "apellido": self.get_apellido(),
             "rol": self.get_rol()
@@ -53,7 +52,6 @@ class UsuarioModel:
     
     def deserializar(self, data: dict):
         return data(
-            id_usuario = data.get("id_usuario"),
             nombre = data.get("nombre"),
             apellido = data.get("apellido"),
             rol = data.get("rol"),

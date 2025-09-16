@@ -12,11 +12,7 @@ class UsuarioDAO:
     """
 
     @staticmethod
-    def create_user(usuario : object , datos_user : dict) -> bool:
-
-        if usuario.get_rol() != "admin":
-            raise PermissionError("No tienes permiso para crear un usuario")
-
+    def create_user( datos_user : dict) -> bool:
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -26,7 +22,7 @@ class UsuarioDAO:
                 """
                 values = (datos_user.get("nombre"), datos_user.get("apellido"), datos_user.get("rol"), datos_user.get("password_hash"))
                 cursor.execute(query, values)
-                id_nuevo = cursor.lastrowid() #devuelve el id
+                # id_nuevo = cursor.lastrowid() #devuelve el id
                 connection.commit()
                 return True
             except Exception as e:
@@ -37,8 +33,7 @@ class UsuarioDAO:
                 connection.close()
                 
     @staticmethod
-    def read_all_user():
-
+    def read_all_user() -> dict:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
@@ -71,17 +66,14 @@ class UsuarioDAO:
                 
 
     @staticmethod
-    def update_user(usuario: object, id_usuario : int, data: dict):
-        
-        if usuario.get_roll() != "admin" and usuario.get_roll() != "editor":
-            raise PermissionError("No tienes permiso para modificar un usuario")
+    def update_user( id_usuario : int, data: dict):
         
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
                 query = """
                     UPDATE usuarios
-                    SET nombre=%s, apellido=%s, email=%s, rol=%s, password_hash=%s
+                    SET nombre=%s, apellido=%s, rol=%s, password_hash=%s
                     WHERE id=%s
                  """
                 values = (
@@ -103,10 +95,7 @@ class UsuarioDAO:
                 
                 
     @staticmethod
-    def delete_user(usuario: object, id_usuario : int ):
-        
-        if usuario.get_roll() != "admin" and usuario.get_roll() != "editor":
-            raise PermissionError("No tienes permiso para eliminar un usuario")
+    def delete_user( id_usuario : int ):
         
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
@@ -121,3 +110,27 @@ class UsuarioDAO:
                 return False
             finally:
                 connection.close()
+
+    @staticmethod
+    def buscar_user_name(user_name: str) -> dict | None:
+        connection = ConectDB.get_connection()
+        with connection.cursor(dictionary=True) as cursor:
+            try:
+                query = "SELECT * FROM usuarios"
+                cursor.execute(query,)
+                rows = cursor.fetchall()
+                usuarios = []
+                for row in rows:
+                    if row["nombre"] == user_name:
+                        usuarios.append(row)
+                return None
+            except Exception as e:
+                print(f"Error deleting user: {e}")
+                connection.rollback()
+                return False
+            finally:
+                connection.close()
+
+                
+
+        
