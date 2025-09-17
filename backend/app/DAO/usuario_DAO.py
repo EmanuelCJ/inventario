@@ -12,7 +12,7 @@ class UsuarioDAO:
     """
 
     @staticmethod
-    def create_user( datos_user : dict) -> bool:
+    def create_user( datos_user : dict) -> int | None:
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -24,7 +24,10 @@ class UsuarioDAO:
                 cursor.execute(query, values)
                 # id_nuevo = cursor.lastrowid() #devuelve el id
                 connection.commit()
-                return True
+                id_nuevo = connection.lastrowid()
+                if id_nuevo:
+                    return id_nuevo
+                return None
             except Exception as e:
                 connection.rollback()
                 print(f"Error creating user: {e}")
@@ -33,7 +36,7 @@ class UsuarioDAO:
                 connection.close()
                 
     @staticmethod
-    def read_all_user() -> dict:
+    def read_all_user() -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
@@ -51,7 +54,7 @@ class UsuarioDAO:
                 connection.close()
                 
     @staticmethod
-    def read_one_user(usuario_id : int):
+    def read_one_user(usuario_id : int) -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
@@ -66,7 +69,7 @@ class UsuarioDAO:
                 
 
     @staticmethod
-    def update_user( id_usuario : int, data: dict):
+    def update_user( id_usuario : int, data: dict) -> bool:
         
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
@@ -93,10 +96,8 @@ class UsuarioDAO:
             finally:
                 connection.close()
                 
-                
     @staticmethod
-    def delete_user( id_usuario : int ):
-        
+    def delete_user( id_usuario : int ) -> bool:      
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -112,18 +113,20 @@ class UsuarioDAO:
                 connection.close()
 
     @staticmethod
-    def buscar_user_name(user_name: str) -> dict | None:
+    def search_user_name(user_name: str) -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT * FROM usuarios"
-                cursor.execute(query,)
+                query = "SELECT id, nombre, apellido, rol FROM usuarios WHERE nombre = %s"
+                cursor.execute(query,(user_name,))
                 rows = cursor.fetchall()
                 usuarios = []
                 for row in rows:
-                    if row["nombre"] == user_name:
-                        usuarios.append(row)
-                return None
+                    usuarios.append(row)
+                if usuarios :
+                    return usuarios
+                else:
+                    return None
             except Exception as e:
                 print(f"Error deleting user: {e}")
                 connection.rollback()
@@ -131,6 +134,28 @@ class UsuarioDAO:
             finally:
                 connection.close()
 
+    @staticmethod
+    def search_user_rol(rol_user: str) -> dict | None:
+        connection = ConectDB.get_connection()
+        with connection.cursor(dictionary=True) as cursor:
+            try:
+                query = "SELECT id, nombre, apellido, rol FROM usuarios WHERE rol = %s"
+                cursor.execute(query,(rol_user,))
+                rows = cursor.fetchall()
+                usuarios = []
+                for row in rows:
+                    usuarios.append(row)
+                if usuarios :
+                    return usuarios
+                else:
+                    return None
+            except Exception as e:
+                print(f"Error deleting user: {e}")
+                connection.rollback()
+                return False
+            finally:
+                connection.close()
+    
                 
 
         

@@ -5,7 +5,7 @@ from ..utils.generation_password import hash_password
 class UsuarioController:
 
     @staticmethod
-    def create_user_controller(usuario : object, datos_user : dict) -> bool:
+    def create_user_controller(usuario : object, datos_user : dict) -> int:
         if usuario.get_rol() != 'admin' and usuario.get_rol() != 'editor':
             raise PermissionError("No tienes permiso para crear un producto")
         return UsuarioDAO.create_user(datos_user)
@@ -23,18 +23,21 @@ class UsuarioController:
         return UsuarioDAO.delete_user(id_usuario)
 
     @staticmethod
-    def read_user_controller(id_usuario: int)-> dict:
+    def read_user_controller(id_usuario: int) -> dict:
         return UsuarioDAO.read_one_user(id_usuario)
 
     @staticmethod
-    def read_all_user_controller()-> dict:
+    def read_all_user_controller() -> dict:
         return UsuarioDAO.read_all_user()
     
     @staticmethod
-    def buscar_user_controller( nombre_user: str )-> dict:
-        return UsuarioDAO.buscar_user_name(nombre_user)
+    def search_user_controller( nombre_user: str ) -> dict:
+        return UsuarioDAO.search_user_name(nombre_user)
 
-
+    @staticmethod
+    def search_user_rol(rol_user: str) -> dict:
+        return UsuarioDAO.search_user_rol(rol_user)
+    
 """
 
 este codigo de abajo debe borrarse se usa para ver si funciona
@@ -45,30 +48,36 @@ este codigo de abajo debe borrarse se usa para ver si funciona
 user = UsuarioModel("Emanuel","Sanchez","editor","1234")
 
 nuevo = {
-    "nombre": "juan",
-    "apellido": "jose",
-    "rol": "editor",
-    "password_hash":  hash_password("miclave124")
+    "nombre": "emanuel",
+    "apellido": "castrillo",
+    "rol": "admin",
+    "password_hash":  hash_password("miclave1e4")
 }
 
-editado = {
+editado2 = {
     "nombre": "juan",
     "apellido": "bruno",
     "rol": "mar",
     "password_hash":  hash_password("miclave124")
 }
+editado = {
+    "nombre": None,
+    "apellido": None,
+    "rol": "visor",
+    "password_hash": None
+}
 
-# respuesta = UsuarioController.create_user_controller(user, nuevo)
+#respuesta = UsuarioController.create_user_controller(user, nuevo)
 
-# print (respuesta)
+#print (respuesta)
 
-#update = UsuarioController.update_user_controller(user,5,editado)
+# update = UsuarioController.update_user_controller(user,3,editado)
 
-#print(update)
+# print(update)
 
-# delect = UsuarioController.delect_user_controller(user,6)
+delect = UsuarioController.delect_user_controller(user,4)
 
-# print(delect)
+print(delect)
 
 # read_one = UsuarioController.read_user_controller(2)
 
@@ -80,7 +89,7 @@ editado = {
 #     print("No existe usuario")
 # print(read_one)
 
-buscar = UsuarioController.buscar_user_controller("Emanuel")
+#buscar = UsuarioController.search_user_rol("admin")
 
-print(buscar)
+#print(buscar)
 
