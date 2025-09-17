@@ -67,12 +67,11 @@ class MovimientosDAO:
             try:
                 query = """
                     UPDATE movimientos
-                    SET tipo=%s, fecha=%s, cantidad=%s, id_usuario=%s
+                    SET tipo=%s, cantidad=%s, id_usuario=%s
                     WHERE id_usuario=%s
                  """
                 values = (
                     data_movimiento["tipo"],
-                    data_movimiento["fecha"],
                     data_movimiento["cantidad"],
                     data_movimiento["id_usuario"],
                     id_usuario
@@ -124,14 +123,16 @@ class MovimientosDAO:
                 return False
             finally:
                 connection.close()
-
+    """
+    Esta funcion recibe dos fecha y devuelve el rango de movimientos.
+    """
     @staticmethod
-    def search_movimiento_fecha(rol_user: str) -> dict | None:
+    def search_movimiento_fecha(fecha_desde: str, fecha_hasta: str) -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, nombre, apellido, rol FROM usuarios WHERE rol = %s"
-                cursor.execute(query,(rol_user,))
+                query = "SELECT * FROM movimientos WHERE DATE(fecha) BETWEEN %s AND %s"
+                cursor.execute(query,(fecha_desde,fecha_hasta,))
                 rows = cursor.fetchall()
                 usuarios = []
                 for row in rows:
@@ -147,6 +148,4 @@ class MovimientosDAO:
             finally:
                 connection.close()
     
-                
-
         
