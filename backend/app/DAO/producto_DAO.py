@@ -17,7 +17,7 @@ class ProductoDAO:
         with connection.cursor() as cursor:
             try:
                 query = """
-                    INSERT INTO producto (nombre, descripcion, condicion, cantidad)
+                    INSERT INTO productos (nombre, descripcion, condicion, cantidad)
                     VALUES (%s, %s, %s, %s)
                 """
                 values = (datos_product.get("nombre"), datos_product.get("descripcion"), datos_product.get("condicion"), datos_product.get("cantidad"))

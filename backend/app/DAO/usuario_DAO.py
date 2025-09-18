@@ -17,12 +17,11 @@ class UsuarioDAO:
         with connection.cursor() as cursor:
             try:
                 query = """
-                    INSERT INTO usuarios (nombre, apellido, rol, password_hash)
-                    VALUES (%s, %s, %s, %s)
+                    INSERT INTO usuarios (nombre, apellido, user_name , rol, password_hash)
+                    VALUES (%s, %s, %s, %s, %s)
                 """
-                values = (datos_user.get("nombre"), datos_user.get("apellido"), datos_user.get("rol"), datos_user.get("password_hash"))
+                values = (datos_user.get("nombre"), datos_user.get("apellido"),datos_user.get("user_name"), datos_user.get("rol"), datos_user.get("password_hash"))
                 cursor.execute(query, values)
-                # id_nuevo = cursor.lastrowid() #devuelve el id
                 connection.commit()
                 id_nuevo = connection.lastrowid()
                 if id_nuevo:
@@ -40,7 +39,7 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, nombre, apellido, rol FROM usuarios"
+                query = "SELECT id, user_name , nombre, apellido, rol FROM usuarios"
                 cursor.execute(query,)
                 rows = cursor.fetchall()
                 usuarios = []
@@ -58,7 +57,7 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, nombre, apellido, rol FROM usuarios WHERE id = %s"
+                query = "SELECT id, user_name , nombre, apellido, rol FROM usuarios WHERE id = %s"
                 cursor.execute(query, (usuario_id,))
                 return cursor.fetchone() #diccionario o None
             except Exception as e:
@@ -82,6 +81,7 @@ class UsuarioDAO:
                 values = (
                     data["nombre"],
                     data["apellido"],
+                    data["user_name"],
                     data["rol"],
                     data["password_hash"],
                     id_usuario
@@ -117,7 +117,7 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, nombre, apellido, rol FROM usuarios WHERE nombre = %s"
+                query = "SELECT id, user_name , nombre, apellido, rol FROM usuarios WHERE nombre = %s"
                 cursor.execute(query,(user_name,))
                 rows = cursor.fetchall()
                 usuarios = []
@@ -139,7 +139,7 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, nombre, apellido, rol FROM usuarios WHERE rol = %s"
+                query = "SELECT id, user_name , nombre, apellido, rol FROM usuarios WHERE rol = %s"
                 cursor.execute(query,(rol_user,))
                 rows = cursor.fetchall()
                 usuarios = []
