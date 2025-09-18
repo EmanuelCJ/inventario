@@ -3,33 +3,35 @@ from ..utils.generation_password import hash_password
 
 class UsuarioModel:
 
-    def __init__(self, nombre: str, apellido: str, rol: str, contrasena: str):
+    def __init__(self, id : int, nombre: str, apellido: str, rol: str, contrasena: str):
 
+        self.__id = id
         self.__nombre = nombre
         self.__apellido = apellido
         self.__rol = rol
         self.__contrasena = hash_password(contrasena)
 
+    def get_id(self) -> int:
+        return self.__id
 
     def get_nombre(self) -> str:
         return self.__nombre
     
     def set_nombre(self, nombre: str):
-        #validar que sea admin para modificar
         self.__nombre = nombre
 
     def get_apellido(self) -> str:
         return self.__apellido
     
     def set_apellido(self, apellido: str):
-        #validar que sea admin para modificar
         self.__apellido = apellido
 
     def get_rol(self) -> str:
         return self.__rol
     
     def set_rol(self, rol: str):
-        #validar que sea admin para modificar rol
+        if self.get_rol() != 'admin':
+            raise PermissionError("No tienes permiso para cambiar rol")
         self.__rol = rol
 
     def get_contrasena(self) -> str:
@@ -50,7 +52,7 @@ class UsuarioModel:
             "rol": self.get_rol()
         }
     
-    def deserializar(self, data: dict):
+    def deserializar(self, data: dict) -> dict:
         return data(
             nombre = data.get("nombre"),
             apellido = data.get("apellido"),

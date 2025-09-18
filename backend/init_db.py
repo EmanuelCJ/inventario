@@ -150,7 +150,7 @@ cxn.close()
 
 """
     crea las tablas
-    """
+"""
 cxn = mysql.connector.connect(**CONF_DB)
 cursor = cxn.cursor()
 create_tables(TABLES, cursor)
