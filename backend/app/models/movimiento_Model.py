@@ -1,7 +1,5 @@
-from backend.app.db.conexion_DB import get_connection
-from ..utils.validation_rol import validar_permiso
 
-class movimientos_model:
+class MovimientosModel:
     
     def __init__(self, id_movimiento: int, tipo: str, cantidad: int, fecha_creacion: str,fecha_modificacion: str, id_producto: int, id_usuario: int = None):
         
@@ -58,8 +56,8 @@ class movimientos_model:
             "id_usuario": self.get_id_usuario()
         }
     
-    def deserializar(self, data_movimiento: dict) -> "movimientos_model":
-        return movimientos_model(
+    def deserializar(self, data_movimiento: dict) -> "MovimientosModel":
+        return MovimientosModel(
             id_movimiento = data_movimiento.get("id_movimiento"),
             tipo = data_movimiento.get("tipo"),
             cantidad = data_movimiento.get("cantidad"),
