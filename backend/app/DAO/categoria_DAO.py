@@ -27,7 +27,7 @@ class CategoriaDAO:
                 return None
             except Exception as e:
                 connection.rollback()
-                print(f"Error creating categoria: {e}")
+                print(f"Error create_categoria: {e}")
                 return False
             finally:
                 connection.close()
@@ -40,12 +40,12 @@ class CategoriaDAO:
                 query = "SELECT * FROM categoria"
                 cursor.execute(query,)
                 rows = cursor.fetchall()
-                usuarios = []
+                categoria = []
                 for row in rows:
-                    usuarios.append(row)
-                return usuarios   
+                    categoria.append(row)
+                return categoria   
             except Exception as e:
-                print(f"Error creating categoria: {e}")
+                print(f"Error read_all_categoria : {e}")
                 return None
             finally:
                 connection.close()
@@ -66,23 +66,20 @@ class CategoriaDAO:
                 
 
     @staticmethod
-    def update_categoria( id_usuario : int, data: dict) -> bool:
+    def update_categoria( id_categoria : int, data: dict) -> bool:
         
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
                 query = """
-                    UPDATE usuarios
-                    SET nombre=%s, apellido=%s, rol=%s, password_hash=%s
+                    UPDATE categoria
+                    SET nombre=%s, descripcion=%s
                     WHERE id=%s
                  """
                 values = (
                     data["nombre"],
-                    data["apellido"],
-                    data["categoria_name"],
-                    data["rol"],
-                    data["password_hash"],
-                    id_usuario
+                    data["descripcion"],
+                    id_categoria
                 )
                 cursor.execute(query, values)
                 connection.commit()  # importante para que se guarden los cambios sino no se hacen efectivo
@@ -95,12 +92,12 @@ class CategoriaDAO:
                 connection.close()
                 
     @staticmethod
-    def delete_categoria( id_usuario : int ) -> bool:      
+    def delete_categoria( id_categoria : int ) -> bool:      
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
-                query = "DELETE FROM usuarios WHERE id=%s"
-                cursor.execute(query, (id_usuario,))
+                query = "DELETE FROM categoria WHERE id=%s"
+                cursor.execute(query, (id_categoria,))
                 connection.commit()
                 return True
             except Exception as e:
@@ -115,44 +112,23 @@ class CategoriaDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, categoria_name , nombre, apellido, rol FROM usuarios WHERE nombre = %s"
+                query = "SELECT id_categoria FROM categoria WHERE nombre = %s"
                 cursor.execute(query,(categoria_name,))
                 rows = cursor.fetchall()
-                usuarios = []
+                categoria = []
                 for row in rows:
-                    usuarios.append(row)
-                if usuarios :
-                    return usuarios
+                    categoria.append(row)
+                if categoria :
+                    return categoria
                 else:
                     return None
             except Exception as e:
-                print(f"Error deleting categoria: {e}")
+                print(f"Error search categoria: {e}")
                 connection.rollback()
                 return False
             finally:
                 connection.close()
 
-    @staticmethod
-    def search_categoria_rol(rol_categoria: str) -> dict | None:
-        connection = ConectDB.get_connection()
-        with connection.cursor(dictionary=True) as cursor:
-            try:
-                query = "SELECT id, categoria_name , nombre, apellido, rol FROM usuarios WHERE rol = %s"
-                cursor.execute(query,(rol_categoria,))
-                rows = cursor.fetchall()
-                usuarios = []
-                for row in rows:
-                    usuarios.append(row)
-                if usuarios :
-                    return usuarios
-                else:
-                    return None
-            except Exception as e:
-                print(f"Error deleting categoria: {e}")
-                connection.rollback()
-                return False
-            finally:
-                connection.close()
     
                 
 
