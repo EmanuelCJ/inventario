@@ -1,4 +1,4 @@
-class categoriaModel:
+class CategoriaModel:
     def __init__(self, id_categoria : int, nombre: str, descripcion: str):
         self.__id_categoria = id_categoria
         self.__nombre = nombre
@@ -7,11 +7,11 @@ class categoriaModel:
     def get_id(self) -> int :
         return self.__id_categoria
     
-    def get_nombre(self):
+    def get_nombre(self) -> str:
         return self.__nombre
     
     def set_nombre(self, nombre: str):
-        self.nombre = nombre
+        self.__nombre = nombre
     
     def get_descripcion(self) -> str:
         return self.__descripcion
@@ -25,3 +25,10 @@ class categoriaModel:
             "nombre" : self.get_nombre(),
             "descripcion": self.get_descripcion()
         }
+
+    def deserializar(self, data_categoria : dict ) -> "CategoriaModel":
+        return CategoriaModel(
+            id_categoria = data_categoria.get("id_categoria"),
+            nombre = data_categoria.get("nombre"),
+            descripcion = data_categoria.get("descripcion")
+        )
