@@ -29,16 +29,16 @@ class ProductoModel:
         self.__descripcion = descripcion
 
     def get_stock_actual(self)-> str:
-        return self.__condicion
+        return self.__stock_actual
     
     def set_stock_actual(self, stock: int):
         self.__stock_actual = stock
         
     def get_condicion(self) -> str:
-        return self.__cantidad
+        return self.__condicion
     
     def set_condicion(self, condicion: str):
-        self.__cantidad = condicion
+        self.__condicion = condicion
         
     def get_id_categoria(self) -> int:
         return self.__id_categoria

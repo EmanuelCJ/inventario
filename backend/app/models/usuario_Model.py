@@ -2,17 +2,17 @@ from ..utils.generation_password import hash_password
 
 class UsuarioModel:
 
-    def __init__(self, id : int, nombre: str, apellido: str,user_name :str, rol: str, contrasena: str):
+    def __init__(self, id_usuario : int, nombre: str, apellido: str,username :str, rol: str, password: str):
 
-        self.__id = id
+        self.__id_usuario = id_usuario
         self.__nombre = nombre
         self.__apellido = apellido
-        self.__user_name = user_name
+        self.__user_name = username
         self.__rol = rol
-        self.__contrasena = hash_password(contrasena)
+        self.__password = hash_password(password)
 
     def get_id(self) -> int:
-        return self.__id
+        return self.__id_usuario
 
     def get_nombre(self) -> str:
         return self.__nombre
@@ -30,25 +30,19 @@ class UsuarioModel:
         return self.__user_name
     
     def set_user_name(self, nuevo: str):
-        self.__user_name() = nuevo
+        self.__user_name = nuevo
 
     def get_rol(self) -> str:
         return self.__rol
     
     def set_rol(self, rol: str):
-        if self.get_rol() != 'admin':
-            raise PermissionError("No tienes permiso para cambiar rol")
         self.__rol = rol
 
     def get_contrasena(self) -> str:
-        if self.get_rol() != 'admin':
-            raise PermissionError("No tienes permiso para ver la contrasena")
-        return self.__contrasena
+        return self.__password
     
-    def set_contrasena(self, contrasena: str):
-        if self.get_rol() != 'admin':
-            raise PermissionError("No tienes permiso para modificar la contrasena")
-        self.__contrasena = hash_password(contrasena)
+    def set_contrasena(self, password: str):
+        self.__password = hash_password(password)
 
 
     def serializar(self) -> dict:
@@ -60,13 +54,14 @@ class UsuarioModel:
             "rol": self.get_rol()
         }
     
-    def deserializar(self, data_usuario: dict) -> "UsuarioModel":
+    @staticmethod
+    def deserializar(data_usuario: dict) -> "UsuarioModel":
         return UsuarioModel(
-            id = data_usuario.get("id"),
+            id_usuario = data_usuario.get("id"),
             nombre = data_usuario.get("nombre"),
             apellido = data_usuario.get("apellido"),
-            user_name= data_usuario.get("user_name"),
+            username= data_usuario.get("user_name"),
             rol = data_usuario.get("rol"),
-            contrasena = data_usuario.get("contrasena")
+            password = data_usuario.get("password")
         )
 

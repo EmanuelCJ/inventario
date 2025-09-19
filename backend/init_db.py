@@ -24,12 +24,13 @@ TABLES = {}
 
 TABLES['usuarios'] = (
     "CREATE TABLE `usuarios` ("
-    "  `id` int(11) NOT NULL AUTO_INCREMENT,"
+    "  `id_usuario` int(11) NOT NULL AUTO_INCREMENT,"
     "  `nombre` varchar(50) NOT NULL,"
     "  `apellido` varchar(50) NOT NULL,"
-    "  `user_name` varchar(50) NOT NULL,"
+    "  `username` varchar(50) NOT NULL,"
     "  `rol` ENUM('admin','editor','visor') DEFAULT 'visor',"
-    "  PRIMARY KEY (`id`)"
+    "   `password` varchar(255) NOT NULL,"
+    "  PRIMARY KEY (`id_usuario`)"
     ") ENGINE=InnoDB"
 )
 
@@ -42,7 +43,7 @@ TABLES['movimientos'] = (
     "  `cantidad` int(11) NOT NULL,"
     "  `id_usuario` int NOT NULL,"
     "  PRIMARY KEY (`id_movimientos`),"
-    "  FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id`)"
+    "  FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id_usuario`)"
     ") ENGINE=InnoDB"
 )
 
@@ -88,7 +89,40 @@ TABLES["productos_lugar"] = (
     "  FOREIGN KEY (`id_lugar`) REFERENCES `lugar`(`id_lugar`)"
     ") ENGINE=InnoDB"
 )
-
+TABLES["roles"]= (
+    "   CREATE TABLE `roles` ( "
+    "   `id_rol` int(11) AUTO_INCREMENT NOT NULL,"
+    "   `nombre` varchar(50) NOT NULL,"
+    "  `descripcion` varchar(100) NOT NULL,"
+    "  PRIMARY KEY (`id_rol`)"
+    ") ENGINE=InnoDB"
+)
+TABLES["permisos"] = (
+    "   CREATE TABLE `permisos` ( "
+    "   `id_permiso` int(11) AUTO_INCREMENT NOT NULL ,"
+    "   `nombre` varchar(50) NOT NULL,"
+    "   `descripcion` varchar(100) NOT NULL,"
+    "  PRIMARY KEY (`id_permiso`)"
+    ") ENGINE=InnoDB"
+)
+TABLES["roles_permisos"]=(
+    "   CREATE TABLE `roles_permisos` ( "
+    "   `id_rol` int(11) NOT NULL,"
+    "   `id_permiso` int(11) NOT NULL,"
+    "  PRIMARY KEY (`id_rol`,`id_permiso`),"
+    "  FOREIGN KEY (`id_rol`) REFERENCES `roles`(`id_rol`),"
+    "  FOREIGN KEY (`id_permiso`) REFERENCES `permisos`(`id_permiso`)"
+    ") ENGINE=InnoDB"
+)
+TABLES["usuarios_roles"] = (
+    "   CREATE TABLE `usuarios_roles` ( "
+    "   `id_rol` int(11) NOT NULL,"
+    "   `id_usuario` int(11) NOT NULL,"
+    "  PRIMARY KEY (`id_rol`,`id_usuario`),"
+    "  FOREIGN KEY (`id_rol`) REFERENCES `roles`(`id_rol`),"
+    "  FOREIGN KEY (`id_usuario`) REFERENCES `usuarios`(`id_usuario`)"
+    ") ENGINE=InnoDB"
+)
 
 def create_database(cursor):
     try:
