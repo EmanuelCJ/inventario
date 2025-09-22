@@ -29,8 +29,9 @@ class RolesModel:
          "nombre": self.get_nombre(),
          "descripcion" : self.get_descripcion()
       }
-   
-   def deserializar(self, data_roles : dict)-> "RolesModel":
+
+   @staticmethod
+   def deserializar(data_roles : dict)-> "RolesModel":
       return RolesModel(
          id_rol = data_roles.get("id_rol"),
          nombre = data_roles.get("nombre"),

@@ -18,8 +18,23 @@ class PermisosModel:
     def set_nombre(self, nombre : str):
         self.__nombre = nombre
 
-    def get_de(self)->str:
+    def get_descripcion(self)->str:
         return self.__descripcion
    
     def set_descripcion(self, descripcion: str):
         self.__descripcion = descripcion
+
+    def serializar(self)-> dict:
+        return {
+            "id_permisos":self.get_id_permisos(),
+            "nombre": self.get_nombre(),
+            "descripcion": self.get_descripcion()
+        }
+
+    @staticmethod
+    def deserializar(data_permiso: dict)->"PermisosModel":
+        return PermisosModel(
+            id_permisos = data_permiso.get("id_permisos"),
+            nombre = data_permiso.get("nombre"),
+            descripcion = data_permiso.get("descripcion")
+        )

@@ -38,7 +38,8 @@ class ProductoLugarModel:
             "cantidad": self.get_cantidad()
         }
 
-    def deserializar(self, data: dict)->"ProductoLugarModel":
+    @staticmethod
+    def deserializar(data: dict)->"ProductoLugarModel":
         return ProductoLugarModel(
             id_producto_lugar = data.get("id_producto_lugar"),
             id_producto = data.get("id_producto"),

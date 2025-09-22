@@ -17,10 +17,10 @@ class UsuarioDAO:
         with connection.cursor() as cursor:
             try:
                 query = """
-                    INSERT INTO usuarios (nombre, apellido, user_name , rol, password_hash)
+                    INSERT INTO usuarios (nombre, apellido, username , rol, password)
                     VALUES (%s, %s, %s, %s, %s)
                 """
-                values = (datos_user.get("nombre"), datos_user.get("apellido"),datos_user.get("user_name"), datos_user.get("rol"), datos_user.get("password_hash"))
+                values = (datos_user.get("nombre"), datos_user.get("apellido"),datos_user.get("username"), datos_user.get("rol"), datos_user.get("password"))
                 cursor.execute(query, values)
                 connection.commit()
                 id_nuevo = connection.lastrowid()
@@ -39,7 +39,7 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, user_name , nombre, apellido, rol FROM usuarios"
+                query = "SELECT id_usuario, username , nombre, apellido, rol FROM usuarios"
                 cursor.execute(query,)
                 rows = cursor.fetchall()
                 usuarios = []

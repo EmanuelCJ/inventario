@@ -55,8 +55,9 @@ class MovimientosModel:
             "fecha_modificacion": self.get_fecha_modificacion(),
             "id_usuario": self.get_id_usuario()
         }
-    
-    def deserializar(self, data_movimiento: dict) -> "MovimientosModel":
+
+    @staticmethod
+    def deserializar( data_movimiento: dict) -> "MovimientosModel":
         return MovimientosModel(
             id_movimiento = data_movimiento.get("id_movimiento"),
             tipo = data_movimiento.get("tipo"),

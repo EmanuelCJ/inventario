@@ -26,7 +26,8 @@ class LugarModel:
             "descripcion": self.get_descripcion()
         }
 
-    def deserializar(self, data_lugar: dict)-> "LugarModel":
+    @staticmethod
+    def deserializar(data_lugar: dict)-> "LugarModel":
         return LugarModel(
             id_lugar = data_lugar.get("id_lugar"),
             nombre = data_lugar.get("nombre"),

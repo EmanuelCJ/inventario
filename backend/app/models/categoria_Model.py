@@ -26,7 +26,8 @@ class CategoriaModel:
             "descripcion": self.get_descripcion()
         }
 
-    def deserializar(self, data_categoria : dict ) -> "CategoriaModel":
+    @staticmethod
+    def deserializar(data_categoria : dict ) -> "CategoriaModel":
         return CategoriaModel(
             id_categoria = data_categoria.get("id_categoria"),
             nombre = data_categoria.get("nombre"),
