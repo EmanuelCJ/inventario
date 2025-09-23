@@ -4,17 +4,17 @@ from .movimiento_service import MovimientoService
 class UsuarioService:
     
     @staticmethod
-    def create():
-        MovimientoService.registrar()
+    def producto():
+        MovimientoService.registrar_producto()
 
     @staticmethod
-    def update():
-        MovimientoService.
+    def usuario():
+        MovimientoService.registrar_usuario()
 
     @staticmethod
-    def delete():
-        pass
+    def roles():
+        MovimientoService.registrar_roles()
 
     @staticmethod
-    def read():
-        pass
+    def categoria():
+        MovimientoService.registrar_categoria()

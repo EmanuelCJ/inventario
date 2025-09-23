@@ -12,7 +12,7 @@ class UsuarioDAO:
     """
 
     @staticmethod
-    def create_user( datos_user : dict) -> int | None:
+    def create_usuario( datos_user : dict) -> int | None:
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -53,7 +53,7 @@ class UsuarioDAO:
                 connection.close()
                 
     @staticmethod
-    def read_one_user(usuario_id : int) -> dict | None:
+    def read_one_usuario(usuario_id : int) -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
@@ -68,7 +68,7 @@ class UsuarioDAO:
                 
 
     @staticmethod
-    def update_user( id_usuario : int, data: dict) -> bool:
+    def update_usuario( id_usuario : int, data: dict) -> bool:
         
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
@@ -97,7 +97,7 @@ class UsuarioDAO:
                 connection.close()
                 
     @staticmethod
-    def delete_user( id_usuario : int ) -> bool:      
+    def delete_usuario( id_usuario : int ) -> bool:      
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:

@@ -12,7 +12,7 @@ class ProductoDAO:
     """
 
     @staticmethod
-    def create_product(datos_product : dict) -> bool:
+    def create_producto(datos_product : dict) -> bool:
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -51,7 +51,7 @@ class ProductoDAO:
                 connection.close()
                 
     @staticmethod
-    def read_one_product(product_id : int) -> dict:
+    def read_one_producto(product_id : int) -> dict:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
@@ -67,7 +67,7 @@ class ProductoDAO:
                 
 
     @staticmethod
-    def update_product(id_producto : int, data: dict) -> bool:   
+    def update_producto(id_producto : int, data: dict) -> bool:   
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -96,7 +96,7 @@ class ProductoDAO:
                 
                 
     @staticmethod
-    def delete_product(id_product : int ) -> bool:       
+    def delete_producto(id_product : int ) -> bool:       
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
