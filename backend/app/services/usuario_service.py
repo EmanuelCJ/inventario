@@ -9,7 +9,7 @@ class UsuarioService:
 
     @staticmethod
     def update():
-        pass
+        MovimientoService.
 
     @staticmethod
     def delete():
