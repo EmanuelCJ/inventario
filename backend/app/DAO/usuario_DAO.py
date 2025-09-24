@@ -23,7 +23,7 @@ class UsuarioDAO:
                 values = (datos_user.get("nombre"), datos_user.get("apellido"),datos_user.get("username"), datos_user.get("rol"), datos_user.get("password"))
                 cursor.execute(query, values)
                 connection.commit()
-                id_nuevo = connection.lastrowid()
+                id_nuevo = cursor.lastrowid
                 if id_nuevo:
                     return id_nuevo
                 return None
@@ -53,12 +53,12 @@ class UsuarioDAO:
                 connection.close()
                 
     @staticmethod
-    def read_one_usuario(usuario_id : int) -> dict | None:
+    def read_one_usuario(id_usuario : int) -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, user_name , nombre, apellido, rol FROM usuarios WHERE id = %s"
-                cursor.execute(query, (usuario_id,))
+                query = "SELECT id_usuario, username , nombre, apellido, rol FROM usuarios WHERE id_usuario = %s"
+                cursor.execute(query, (id_usuario,))
                 return cursor.fetchone() #diccionario o None
             except Exception as e:
                 print(f"Error reading user: {e}")

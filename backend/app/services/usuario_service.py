@@ -2,4 +2,7 @@
 from ..DAO.usuario_DAO import UsuarioDAO
 
 class UsuarioService:
-    pass
+    
+    @staticmethod
+    def crear_usuario(data_usuario:dict) -> int:
+        return UsuarioDAO.create_usuario(datos_user = data_usuario)

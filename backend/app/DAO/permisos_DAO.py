@@ -1,12 +1,13 @@
 from ..db.conexion_DB import ConectDB
+from ..models.usuario_Model import UsuarioModel
 
 class PermisosDAO:
 
     @staticmethod
-    def validar(usuario: object, permiso: str)-> int | bool:
+    def validar_permisos(usuario: dict, permiso: str)-> int | bool:
 
         #Obtenemos el username
-        username = usuario.get_user_name()
+        username = usuario["username"]
 
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
@@ -23,12 +24,14 @@ class PermisosDAO:
                         AND p.nombre = %s
                     ) AS tiene_permiso;
                 """
-                values = (username, permiso)
+                values = (username, permiso,)
                 cursor.execute(query, values)
                 resultado = cursor.fetchone()
                 # result es un diccionario: {"tiene_permiso": 1} o {"tiene_permiso": 0}
-                return bool(resultado["tiene_permiso"])
-            
+                if bool(resultado[0]):
+                    return True
+                return False
+        
             except Exception as e:
                 print(f"Error validando Permiso : {e}")
                 connection.rollback()
