@@ -1,18 +1,29 @@
 from flask import request, jsonify
 from app.services.usuario_service import UsuarioService
-from ..utils.generation_password import hash_password
 
 class UsuarioController:
     
     @staticmethod
-    def update_usuario():
+    def create_usuario():
         data = request.json
-        filas = UsuarioService.actualizar_usuario(
-            id_usuario=data["id_usuario"],
+        filas = UsuarioService.crear_usuario(
             nombre=data["nombre"],
-            email=data["email"],
+            apellido=data["apellido"],
+            username=data["username"],
             rol=data["rol"],
-            admin_id=data["admin_id"]
+            password=data["password"],
+            id_usuario=data["id_admin"]
         )
         return jsonify({"success": filas > 0})
     
+    @staticmethod
+    def update_usuario():
+        pass
+    
+    @staticmethod
+    def delete_usuario():
+        pass
+    
+    @staticmethod
+    def read_usuario():
+        pass

@@ -1,6 +1,7 @@
 #DAO tiene la persistencia de datos y se comunica con la base de datos
 
 from ..db.conexion_DB import ConectDB
+from ..utils.generation_password import hash_password
 
 class UsuarioDAO:
     
@@ -12,7 +13,11 @@ class UsuarioDAO:
     """
 
     @staticmethod
-    def create_usuario( datos_user : dict) -> int | None:
+    def create_usuario(nombre: str,apellido: str,username:str,rol: str, contrasena: str) -> int | None:
+        
+        #Este metodo encripta la password
+        password = hash_password(password=contrasena)
+        
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
@@ -20,10 +25,10 @@ class UsuarioDAO:
                     INSERT INTO usuarios (nombre, apellido, username , rol, password)
                     VALUES (%s, %s, %s, %s, %s)
                 """
-                values = (datos_user.get("nombre"), datos_user.get("apellido"),datos_user.get("username"), datos_user.get("rol"), datos_user.get("password"))
+                values = (nombre, apellido, username, rol, password)
                 cursor.execute(query, values)
                 connection.commit()
-                return cursor.rowcount  # si se modifica la fila
+                return cursor.lastrowid # 
             except Exception as e:
                 connection.rollback()
                 print(f"Error creating user: {e}")
@@ -65,22 +70,25 @@ class UsuarioDAO:
                 
 
     @staticmethod
-    def update_usuario( id_usuario : int, data: dict) -> bool:
+    def update_usuario( id_usuario : int, nombre: str, apellido: str , username : str, rol: str, contrasena : str) -> bool:
         
+        #Este metodo encripta la password
+        password = hash_password(password=contrasena)
+
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
                 query = """
                     UPDATE usuarios
-                    SET nombre=%s, apellido=%s, rol=%s, password_hash=%s
-                    WHERE id=%s
+                    SET nombre=%s, apellido=%s, rol=%s,username=%s, password=%s
+                    WHERE id_usuario=%s
                  """
                 values = (
-                    data["nombre"],
-                    data["apellido"],
-                    data["user_name"],
-                    data["rol"],
-                    data["password_hash"],
+                    nombre,
+                    apellido,
+                    rol,
+                    username,
+                    password,
                     id_usuario
                 )
                 cursor.execute(query, values)
