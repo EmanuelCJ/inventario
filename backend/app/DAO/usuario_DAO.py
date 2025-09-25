@@ -23,10 +23,7 @@ class UsuarioDAO:
                 values = (datos_user.get("nombre"), datos_user.get("apellido"),datos_user.get("username"), datos_user.get("rol"), datos_user.get("password"))
                 cursor.execute(query, values)
                 connection.commit()
-                id_nuevo = cursor.lastrowid
-                if id_nuevo:
-                    return id_nuevo
-                return None
+                return cursor.rowcount  # si se modifica la fila
             except Exception as e:
                 connection.rollback()
                 print(f"Error creating user: {e}")
