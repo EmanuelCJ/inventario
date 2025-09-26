@@ -31,13 +31,14 @@ class UsuarioDAO:
                 return cursor.lastrowid # 
             except Exception as e:
                 connection.rollback()
-                print(f"Error creating user: {e}")
+                print(f"Error crear usuarioDAO: {e}")
                 return False
             finally:
                 connection.close()
                 
     @staticmethod
     def read_all_user() -> dict | None:
+
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
@@ -49,7 +50,7 @@ class UsuarioDAO:
                     usuarios.append(row)
                 return usuarios   
             except Exception as e:
-                print(f"Error creating user: {e}")
+                print(f"Error read usuarioDAO: {e}")
                 return None
             finally:
                 connection.close()
@@ -63,7 +64,7 @@ class UsuarioDAO:
                 cursor.execute(query, (id_usuario,))
                 return cursor.fetchone() #diccionario o None
             except Exception as e:
-                print(f"Error reading user: {e}")
+                print(f"Error read usuarioDAO: {e}")
                 return None
             finally:
                 connection.close()
@@ -96,7 +97,7 @@ class UsuarioDAO:
                 return cursor.rowcount > 0  # True si actualizó al menos 1 fila
             except Exception as e:
                 connection.rollback() #si falla deshace cambios
-                print(f"Error updating user: {e}")
+                print(f"Error update usuarioDAO: {e}")
                 return False
             finally:
                 connection.close()
@@ -106,24 +107,24 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
-                query = "DELETE FROM usuarios WHERE id=%s"
+                query = "DELETE FROM usuarios WHERE id_usuario=%s"
                 cursor.execute(query, (id_usuario,))
                 connection.commit()
                 return True
             except Exception as e:
                 connection.rollback()
-                print(f"Error deleting user: {e}")
+                print(f"Error delete usuarioDAO: {e}")
                 return False
             finally:
                 connection.close()
 
     @staticmethod
-    def search_user_name(user_name: str) -> dict | None:
+    def search_user_name(username: str) -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
                 query = "SELECT id, user_name , nombre, apellido, rol FROM usuarios WHERE nombre = %s"
-                cursor.execute(query,(user_name,))
+                cursor.execute(query,(username,))
                 rows = cursor.fetchall()
                 usuarios = []
                 for row in rows:
@@ -133,7 +134,7 @@ class UsuarioDAO:
                 else:
                     return None
             except Exception as e:
-                print(f"Error deleting user: {e}")
+                print(f"Error buscar por username usuarioDAO: {e}")
                 connection.rollback()
                 return False
             finally:
@@ -155,7 +156,7 @@ class UsuarioDAO:
                 else:
                     return None
             except Exception as e:
-                print(f"Error deleting user: {e}")
+                print(f"Error buscar por rol usuarioDAO: {e}")
                 connection.rollback()
                 return False
             finally:
