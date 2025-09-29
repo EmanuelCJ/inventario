@@ -26,10 +26,10 @@ class UsuarioModel:
     def set_apellido(self, apellido: str):
         self.__apellido = apellido
 
-    def get_user_name(self)->str:
+    def get_username(self)->str:
         return self.__user_name
     
-    def set_user_name(self, nuevo: str):
+    def set_username(self, nuevo: str):
         self.__user_name = nuevo
 
     def get_rol(self) -> str:
@@ -38,10 +38,10 @@ class UsuarioModel:
     def set_rol(self, rol: str):
         self.__rol = rol
 
-    def get_contrasena(self) -> str:
+    def get_password(self) -> str:
         return self.__password
     
-    def set_contrasena(self, password: str):
+    def set_password(self, password: str):
         self.__password = hash_password(password)
 
 
@@ -50,7 +50,7 @@ class UsuarioModel:
             "id": self.get_id(),
             "nombre": self.get_nombre(),
             "apellido": self.get_apellido(),
-            "user_name":self.get_user_name(),
+            "user_name":self.get_username(),
             "rol": self.get_rol()
         }
     

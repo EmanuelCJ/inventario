@@ -6,7 +6,7 @@ from ..services.auditoria_service import AuditoriaService
 class UsuarioService:
     
     @staticmethod
-    def crear_usuario(nombre: str, apellido: str , username : str, rol: str, password : str , id_admin: int) -> bool:
+    def crear_usuario(new_usuario : object, id_admin: int) -> bool:
         
         #Verifica si el id corresponde a un usuario y lo devuelve
         usuario = UsuarioDAO.read_one_usuario(id_admin)
@@ -14,23 +14,35 @@ class UsuarioService:
             raise Exception("Usuario no encontrado")
         
         try:
+            #verifica si el admin tiene el permiso
             permiso = PermisosDAO.validar_permisos(usuario , "crear_usuario")
-            if not permiso == 1:
+            if permiso:
                 raise Exception("permiso no encontrado")
 
-        
-            id_nuevo_usuario = UsuarioDAO.create_usuario(nombre,apellido,username,rol,password)
+            #verfica si el nombre usuario no esta repetido en la base
+            verificar_username=UsuarioDAO.username_exists(new_usuario["username"])
+            if verificar_username == True:
+                raise Exception("Username no permitido")
+
+            #Crea un usuario nuevo devuelve el id
+            id_nuevo_usuario = UsuarioDAO.create_usuario(
+                nombre= new_usuario.get_nombre(),
+                apellido= new_usuario.get_apellido(),
+                username= new_usuario.get_username(),
+                rol= new_usuario.get_rol(),
+                password_hash= new_usuario.get_password()
+                )
 
             if id_nuevo_usuario:
                 respuesta = AuditoriaService.registrar(
-                    entidad="usuario",
+                    entidad="usuarios",
                     id_entidad=id_nuevo_usuario,
                     accion="create",
-                    descripcion=f"Usuario: {usuario["username"]} creo al usuario {username}",
+                    descripcion=f"Usuario : << {usuario["username"]} >> creo al usuario <<{new_usuario.get_username()}>> ",
                     id_admin=usuario["id_usuario"]
                 )
 
-            return respuesta
+            return bool(respuesta)
         
         except Exception as e:
 

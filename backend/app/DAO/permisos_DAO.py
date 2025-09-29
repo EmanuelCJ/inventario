@@ -1,10 +1,14 @@
 from ..db.conexion_DB import ConectDB
 from ..models.usuario_Model import UsuarioModel
 
-class PermisosDAO:
 
+
+class PermisosDAO:
+    """
+        Esta funcion realizar una query a la base de datos verificando si el usuario tiene permisos para realizar la accion.
+    """
     @staticmethod
-    def validar_permisos(usuario: dict, permiso: str)-> int | bool:
+    def validar_permisos(usuario: dict, permiso: str)-> bool:
 
         #Obtenemos el username
         username = usuario["username"]
@@ -28,10 +32,8 @@ class PermisosDAO:
                 cursor.execute(query, values)
                 resultado = cursor.fetchone()
                 # result es un diccionario: {"tiene_permiso": 1} o {"tiene_permiso": 0}
-                if bool(resultado[0]):
-                    return True
-                return False
-        
+                return bool(resultado["tiene_permiso"])
+            
             except Exception as e:
                 print(f"Error validando Permiso : {e}")
                 connection.rollback()

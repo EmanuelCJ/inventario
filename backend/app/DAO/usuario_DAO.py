@@ -13,10 +13,10 @@ class UsuarioDAO:
     """
 
     @staticmethod
-    def create_usuario(nombre: str,apellido: str,username:str,rol: str, contrasena: str) -> int | None:
+    def create_usuario(nombre: str,apellido: str,username:str,rol: str, password_hash: str) -> int | bool:
         
         #Este metodo encripta la password
-        password = hash_password(password=contrasena)
+        password = hash_password(password=password_hash)
         
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
@@ -28,7 +28,7 @@ class UsuarioDAO:
                 values = (nombre, apellido, username, rol, password)
                 cursor.execute(query, values)
                 connection.commit()
-                return cursor.lastrowid # 
+                return cursor.lastrowid # manda el id ultimo de la tabla
             except Exception as e:
                 connection.rollback()
                 print(f"Error crear usuarioDAO: {e}")
@@ -119,20 +119,14 @@ class UsuarioDAO:
                 connection.close()
 
     @staticmethod
-    def search_user_name(username: str) -> dict | None:
+    def search_username(username: str) -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id, user_name , nombre, apellido, rol FROM usuarios WHERE nombre = %s"
+                query = "SELECT id_usuario, username , nombre, apellido, rol, password FROM usuarios WHERE username = %s"
                 cursor.execute(query,(username,))
-                rows = cursor.fetchall()
-                usuarios = []
-                for row in rows:
-                    usuarios.append(row)
-                if usuarios :
-                    return usuarios
-                else:
-                    return None
+                row = cursor.fetchone()
+                return row
             except Exception as e:
                 print(f"Error buscar por username usuarioDAO: {e}")
                 connection.rollback()
@@ -160,8 +154,19 @@ class UsuarioDAO:
                 connection.rollback()
                 return False
             finally:
-                connection.close()
-    
-                
+                connection.close()       
 
-        
+    @staticmethod
+    def username_exists(username: str) -> bool:
+        connection = ConectDB.get_connection()
+        with connection.cursor(dictionary=True) as cursor:
+            try:
+                query = "SELECT 1 FROM usuarios WHERE username = %s LIMIT 1"
+                cursor.execute(query, (username,))
+                result = cursor.fetchone()
+                return result is not None
+            except Exception as e:
+                print(f"Error al verificar existencia de username: {e}")
+                return False
+            finally:
+                connection.close()
