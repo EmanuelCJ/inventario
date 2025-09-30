@@ -6,7 +6,6 @@ class AuthControllers:
     @staticmethod
     def create_token(username: str , password: str):
         token = AuthService.login(username, password)
-        print(f"token esta ", token)
         if token:
             return token
         return False

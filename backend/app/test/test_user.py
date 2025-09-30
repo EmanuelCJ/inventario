@@ -1,19 +1,24 @@
 from ..services.usuario_service import UsuarioService
+from ..models.usuario_Model import UsuarioModel
 
 class TestUser:
 
     @staticmethod
     def crear_usuario_test():
 
+        data = { 
+            "nombre" : "ALEX",
+            "apellido"  :  "ALEJO", 
+            "username" :  "doom123",
+            "rol" :  "admin", 
+            "password" :  "arsa2025"
+            }
+        usuario=UsuarioModel.deserializar(data)
 
         #test
         respuesta = UsuarioService.crear_usuario(
-            nombre = "ALEX",
-            apellido  =  "ALEJO", 
-            username =  "doom123", 
-            rol =  "admin", 
-            password =  "arsa2025",
-            id_admin =  1
+            usuario,
+            1
         )
         return respuesta
     
@@ -22,12 +27,12 @@ class TestUser:
 
         #test
         respuesta = UsuarioService.update_usuario(
-            id_usuario = 31,
+            id_usuario = 28,
             nombre = "nico",
-            apellido  =  "ex", 
-            username =  "HOLA MUNDO", 
-            rol =  "editor", 
-            password =  "casad",
+            apellido  =  "j", 
+            username =  "doom123", 
+            rol =  "admin", 
+            password =  "arsa2025",
             id_admin=  1
         )
         return respuesta
@@ -42,14 +47,14 @@ class TestUser:
         return UsuarioService.read_usuario()
 
 
-print("Read usuario + registrar movimiento: ")
-print(TestUser.read_usuario_test())
+# print("Read usuario + registrar movimiento: ")
+# print(TestUser.read_usuario_test())
 
-print("Crear Usuario + registrar movimiento: ")
-print(TestUser.crear_usuario_test())
+# print("Crear Usuario + registrar movimiento: ")
+# print(TestUser.crear_usuario_test())
 
 print("Update Usuario + registrar movimiento: ")
 print(TestUser.update_usuario_test())
 
-print("Elimina un usuario:")
-print(TestUser.delete_usuario_test())
+# print("Elimina un usuario:")
+# print(TestUser.delete_usuario_test())

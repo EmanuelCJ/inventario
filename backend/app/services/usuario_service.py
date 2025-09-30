@@ -20,7 +20,7 @@ class UsuarioService:
                 raise Exception("permiso no encontrado")
 
             #verfica si el nombre usuario no esta repetido en la base
-            verificar_username=UsuarioDAO.username_exists(new_usuario["username"])
+            verificar_username=UsuarioDAO.username_exists(new_usuario.get_username())
             if verificar_username == True:
                 raise Exception("Username no permitido")
 
@@ -50,7 +50,7 @@ class UsuarioService:
             return False
         
     @staticmethod
-    def update_usuario(id_usuario : str,nombre: str, apellido: str , username : str, rol: str, password : str , id_admin: int) -> int:
+    def update_usuario(id_usuario : int,nombre: str, apellido: str , username : str, rol: str, password : str , id_admin: int) -> int:
         
         #Verifica si el id corresponde a un usuario y lo devuelve
         usuario = UsuarioDAO.read_one_usuario(id_admin)

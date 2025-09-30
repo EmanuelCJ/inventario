@@ -1,6 +1,7 @@
 # controllers/auth_controller.py
 from flask import Blueprint, request, jsonify
 from ..controllers.auth_controllers import AuthControllers
+from ..utils.generation_password import hash_password
 
 auth_bp = Blueprint("auth_bp", __name__)
 
@@ -9,8 +10,8 @@ def login():
     
     data = request.get_json()
     
-    username = data.get("username")
-    password = data.get("password")
+    username = data["username"]
+    password = hash_password(data["password"])
 
     token = AuthControllers.create_token(username, password)
     

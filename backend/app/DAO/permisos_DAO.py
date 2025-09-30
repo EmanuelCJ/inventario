@@ -28,7 +28,7 @@ class PermisosDAO:
                         AND p.nombre = %s
                     ) AS tiene_permiso;
                 """
-                values = (username, permiso,)
+                values = (username, permiso)
                 cursor.execute(query, values)
                 resultado = cursor.fetchone()
                 # result es un diccionario: {"tiene_permiso": 1} o {"tiene_permiso": 0}

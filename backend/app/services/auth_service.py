@@ -12,7 +12,7 @@ load_dotenv()
 
 
 """
-        Service genera el token y ademas verifica
+    Service genera el token y ademas verifica
 """
 
 #obtengo super clave desde las variables de entono
@@ -26,16 +26,19 @@ class AuthService:
         if not usuario:
             return None
 
-        stored_hash = usuario.get("password")
+        stored_hash = usuario["password"]
         if not stored_hash:
             return None
-
+        
+        print(stored_hash)
+        print(password)
+        
         if not check_password_hash(stored_hash, password):
             return None
 
         payload = {
-            "id_usuario": usuario.get("id_usuario"),
-            "rol": usuario.get("rol"),
+            "id_usuario": usuario["id_usuario"],
+            "rol": usuario["rol"],
             "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
         }
 

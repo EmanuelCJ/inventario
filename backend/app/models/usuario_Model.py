@@ -47,7 +47,7 @@ class UsuarioModel:
 
     def serializar(self) -> dict:
         return {
-            "id": self.get_id(),
+            "id_usuario": self.get_id(),
             "nombre": self.get_nombre(),
             "apellido": self.get_apellido(),
             "user_name":self.get_username(),
@@ -57,7 +57,7 @@ class UsuarioModel:
     @staticmethod
     def deserializar(data_usuario: dict) -> "UsuarioModel":
         return UsuarioModel(
-            id_usuario = data_usuario.get("id"),
+            id_usuario = data_usuario.get("id_usuario"),
             nombre = data_usuario.get("nombre"),
             apellido = data_usuario.get("apellido"),
             username= data_usuario.get("user_name"),
