@@ -123,7 +123,7 @@ class UsuarioDAO:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
-                query = "SELECT id_usuario, username , nombre, apellido, rol, password FROM usuarios WHERE username = %s"
+                query = "SELECT * FROM usuarios WHERE username = %s"
                 cursor.execute(query,(username,))
                 row = cursor.fetchone()
                 return row

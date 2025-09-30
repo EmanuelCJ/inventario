@@ -23,7 +23,7 @@ def create_usuario():
 
 # READ ONE
 @usuario_bp.route("/usuarios/<int:id_usuario>", methods=["GET"])
-def get_usuarios(id_usuario):
+def get_usuarios_one(id_usuario):
     usuario = UsuarioController.get_usuarios(id_usuario)
     if usuario:
         return jsonify(usuario.to_dict()), 200
@@ -31,7 +31,7 @@ def get_usuarios(id_usuario):
 
 # READ ALL
 @usuario_bp.route("/usuarios", methods=["GET"])
-def get_usuarios():
+def get_usuarios_all():
     usuarios = UsuarioController.get_usuarios()
     return jsonify([p.to_dict() for p in usuarios]), 200
 

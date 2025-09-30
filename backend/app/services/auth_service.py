@@ -4,27 +4,48 @@ from datetime import datetime, timedelta, timezone
 import os
 from ..DAO.usuario_DAO import UsuarioDAO
 from werkzeug.security import check_password_hash
+#cargar las variables de entorno desde el archivo .env
+from dotenv import load_dotenv
+
+# Cargar las variables de entorno desde el archivo .env
+load_dotenv()
+
 
 """
         Service genera el token y ademas verifica
 """
+
 #obtengo super clave desde las variables de entono
 SECRET_KEY = os.getenv("SECRET_KEY")  # En tu .env
 
 class AuthService:
-    
+
     @staticmethod
     def login(username, password):
         usuario = UsuarioDAO.search_username(username)
-        if usuario and check_password_hash(usuario["password"], password):
-            payload = {
-                "id": usuario["id_usuario"],
-                "rol": usuario["rol"],
-                "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
-            }
-            token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-            return token
-        return None
+        if not usuario:
+            return None
+
+        stored_hash = usuario.get("password")
+        if not stored_hash:
+            return None
+
+        if not check_password_hash(stored_hash, password):
+            return None
+
+        payload = {
+            "id_usuario": usuario.get("id_usuario"),
+            "rol": usuario.get("rol"),
+            "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+        }
+
+        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+        if isinstance(token, bytes):  # compatibilidad
+            token = token.decode("utf-8")
+
+            print("Token generado:", token)  # Siempre imprime
+
+        return token
 
     @staticmethod
     def verificar_token(token):

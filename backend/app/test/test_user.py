@@ -5,14 +5,13 @@ class TestUser:
     @staticmethod
     def crear_usuario_test():
 
-        
 
         #test
         respuesta = UsuarioService.crear_usuario(
             nombre = "ALEX",
             apellido  =  "ALEJO", 
             username =  "doom123", 
-            rol =  "editor", 
+            rol =  "admin", 
             password =  "arsa2025",
             id_admin =  1
         )
