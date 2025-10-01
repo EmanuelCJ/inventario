@@ -1,25 +1,25 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.controllers.usuario_controllers import UsuarioController
+from ..utils.validacion_token import token_required
+
 
 usuario_bp = Blueprint("usuario_bp", __name__)
 
 # CREATE
 @usuario_bp.route("/usuarios", methods=["POST"])
-@jwt_required()
-def create_usuario():
-    current_user = get_jwt_identity() 
-    
+@token_required
+def create_usuario(current_user):   # 👈 payload inyectado aquí
     if current_user["rol"] != "admin":
         return jsonify({"error": "No autorizado"}), 403
     
     data = request.get_json()
     usuario = UsuarioController.create_usuario(data, current_user["id_usuario"])
     
-    if not usuario:
+    if usuario:
         return jsonify(usuario.to_dict()), 201
     
     return jsonify({"error": "No se pudo crear el usuario"}), 400
+
 
 # READ ONE
 @usuario_bp.route("/usuarios/<int:id_usuario>", methods=["GET"])

@@ -39,6 +39,8 @@ class AuthService:
             "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
         }
 
+        print(datetime.now(timezone.utc) + timedelta(minutes=30))
+
         token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
         if isinstance(token, bytes):  # compatibilidad
             token = token.decode("utf-8")
@@ -49,9 +51,16 @@ class AuthService:
     @staticmethod
     def verificar_token(token):
         try:
+            # Decodifica, valida firma y exp automáticamente
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            return payload  # te da {id, rol, exp}
+            
+            # Si llegó acá, el token es válido
+            print("✅ Token válido:", payload)
+            return payload
+
         except jwt.ExpiredSignatureError:
+            print("❌ Token expirado")
             return None
         except jwt.InvalidTokenError:
+            print("❌ Token inválido")
             return None
