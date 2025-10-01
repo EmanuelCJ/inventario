@@ -11,7 +11,7 @@ def login():
     data = request.get_json()
     
     username = data["username"]
-    password = hash_password(data["password"])
+    password = data["password"]
 
     token = AuthControllers.create_token(username, password)
     
@@ -24,6 +24,7 @@ def login():
 
 @auth_bp.route("/protegido", methods=["GET"])
 def protegido():
+    
     token = request.headers.get("Authorization")  # Enviar: Bearer <token>
     if not token:
         return jsonify({"error": "Falta token"}), 401

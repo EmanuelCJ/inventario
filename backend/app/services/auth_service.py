@@ -26,14 +26,11 @@ class AuthService:
         if not usuario:
             return None
 
-        stored_hash = usuario["password"]
-        if not stored_hash:
+        password_hash_db = usuario["password"]
+        if not password_hash_db:
             return None
         
-        print(stored_hash)
-        print(password)
-        
-        if not check_password_hash(stored_hash, password):
+        if not check_password_hash(password_hash_db, password):
             return None
 
         payload = {
@@ -47,7 +44,6 @@ class AuthService:
             token = token.decode("utf-8")
 
             print("Token generado:", token)  # Siempre imprime
-
         return token
 
     @staticmethod

@@ -8,13 +8,13 @@ usuario_bp = Blueprint("usuario_bp", __name__)
 @usuario_bp.route("/usuarios", methods=["POST"])
 @jwt_required()
 def create_usuario():
-    current_user = get_jwt_identity()  # dict con {id_usuario, rol}
+    current_user = get_jwt_identity() 
     
     if current_user["rol"] != "admin":
         return jsonify({"error": "No autorizado"}), 403
     
     data = request.get_json()
-    usuario = UsuarioController.create_usuario(data, current_user["id"])
+    usuario = UsuarioController.create_usuario(data, current_user["id_usuario"])
     
     if not usuario:
         return jsonify(usuario.to_dict()), 201
