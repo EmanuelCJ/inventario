@@ -14,15 +14,16 @@ class UsuarioService:
             raise Exception("Usuario no encontrado")
         
         try:
-            #verifica si el admin tiene el permiso
+            #verifica si el usuario tiene el permiso
             permiso = PermisosDAO.validar_permisos(usuario , "crear_usuario")
-            if permiso:
+            if permiso != 1:
                 raise Exception("permiso no encontrado")
+                
 
             #verfica si el nombre usuario no esta repetido en la base
             verificar_username=UsuarioDAO.username_exists(new_usuario.get_username())
             if verificar_username == True:
-                raise Exception("Username no permitido")
+                raise Exception("El username ya existe")
 
             #Crea un usuario nuevo devuelve el id
             id_nuevo_usuario = UsuarioDAO.create_usuario(
@@ -41,11 +42,12 @@ class UsuarioService:
                     descripcion=f"Usuario : << {usuario["username"]} >> creo al usuario <<{new_usuario.get_username()}>> ",
                     id_admin=usuario["id_usuario"]
                 )
+                return bool(respuesta)
 
-            return bool(respuesta)
+            return False
         
         except Exception as e:
-
+            
             print(f"Error en create usuario_service {e}")
             return False
         

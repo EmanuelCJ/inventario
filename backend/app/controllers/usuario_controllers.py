@@ -6,16 +6,23 @@ class UsuarioController:
     @staticmethod
     def create_usuario(data: dict, current_user: int):
         try:
-            nuevo_usuario = UsuarioModel.deserializar(data)  # ← tu modelo
-            
-            if not nuevo_usuario:
-                respuesta=UsuarioService.crear_usuario(
-                    new_usuario=nuevo_usuario,
-                    id_admin=current_user
-                )
+            # Validación de entrada mínima
+            if not data.get("username") or not data.get("password"):
+                raise ValueError("Faltan campos obligatorios")
+
+            # Crear modelo desde dict
+            nuevo_usuario = UsuarioModel.deserializar(data)
+
+            # Llamar al service
+            respuesta = UsuarioService.crear_usuario(
+                new_usuario=nuevo_usuario,
+                id_admin=current_user
+            )
+
             if respuesta:
                 return nuevo_usuario
-        
+            return False
+
         except Exception as e:
             print(f"Error al crear usuario nuevo controller: {e}")
             return False

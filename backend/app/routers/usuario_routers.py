@@ -6,7 +6,7 @@ from ..utils.validacion_token import token_required
 usuario_bp = Blueprint("usuario_bp", __name__)
 
 # CREATE
-@usuario_bp.route("/usuarios", methods=["POST"])
+@usuario_bp.route("/create", methods=["POST"])
 @token_required
 def create_usuario(current_user):   # 👈 payload inyectado aquí
     if current_user["rol"] != "admin":
@@ -16,13 +16,13 @@ def create_usuario(current_user):   # 👈 payload inyectado aquí
     usuario = UsuarioController.create_usuario(data, current_user["id_usuario"])
     
     if usuario:
-        return jsonify(usuario.to_dict()), 201
+        return jsonify(usuario.serializar()), 201
     
     return jsonify({"error": "No se pudo crear el usuario"}), 400
 
 
 # READ ONE
-@usuario_bp.route("/usuarios/<int:id_usuario>", methods=["GET"])
+@usuario_bp.route("/search/<int:id_usuario>", methods=["GET"])
 def get_usuarios_one(id_usuario):
     usuario = UsuarioController.get_usuarios(id_usuario)
     if usuario:
@@ -30,13 +30,13 @@ def get_usuarios_one(id_usuario):
     return jsonify({"error": "Usuario no encontrado"}), 404
 
 # READ ALL
-@usuario_bp.route("/usuarios", methods=["GET"])
+@usuario_bp.route("/read", methods=["GET"])
 def get_usuarios_all():
     usuarios = UsuarioController.get_usuarios()
     return jsonify([p.to_dict() for p in usuarios]), 200
 
 # UPDATE
-@usuario_bp.route("/usuarios/<int:id_usuario>", methods=["PUT"])
+@usuario_bp.route("/update/<int:id_usuario>", methods=["PUT"])
 def update_usuario(id_usuario):
     data = request.get_json()
     usuario = UsuarioController.update_usuario(id_usuario, data)
@@ -45,7 +45,7 @@ def update_usuario(id_usuario):
     return jsonify({"error": "No se pudo actualizar el usuario"}), 400
 
 # DELETE
-@usuario_bp.route("/usuarios/<int:id_usuario>", methods=["DELETE"])
+@usuario_bp.route("/delete/<int:id_usuario>", methods=["DELETE"])
 def delete_usuario(id_usuario):
     success = UsuarioController.delete_usuario(id_usuario)
     if success:

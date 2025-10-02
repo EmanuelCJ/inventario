@@ -14,7 +14,7 @@ class PermisosDAO:
         username = usuario["username"]
 
         connection = ConectDB.get_connection()
-        with connection.cursor() as cursor:
+        with connection.cursor(dictionary=True) as cursor:
             try:
                 query = """
                     SELECT EXISTS (
@@ -31,8 +31,9 @@ class PermisosDAO:
                 values = (username, permiso)
                 cursor.execute(query, values)
                 resultado = cursor.fetchone()
+                
                 # result es un diccionario: {"tiene_permiso": 1} o {"tiene_permiso": 0}
-                return bool(resultado["tiene_permiso"])
+                return resultado["tiene_permiso"]
             
             except Exception as e:
                 print(f"Error validando Permiso : {e}")
