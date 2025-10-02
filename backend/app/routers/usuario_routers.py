@@ -37,9 +37,14 @@ def get_usuarios_all():
 
 # UPDATE
 @usuario_bp.route("/update/<int:id_usuario>", methods=["PUT"])
-def update_usuario(id_usuario):
+@token_required
+def update_usuario(current_user):
+    if current_user["rol"] != "admin":
+        return jsonify({"error": "No autorizado"}), 403
+    
     data = request.get_json()
-    usuario = UsuarioController.update_usuario(id_usuario, data)
+
+    usuario = UsuarioController.update_usuario(current_user["id_usuario"], data)
     if usuario:
         return jsonify(usuario.to_dict()), 200
     return jsonify({"error": "No se pudo actualizar el usuario"}), 400
