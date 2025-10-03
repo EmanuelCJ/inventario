@@ -21,42 +21,47 @@ def create_usuario(current_user):   # payload inyectado aca
     return jsonify({"error": "No se pudo crear el usuario"}), 400
 
 # UPDATE
-# UPDATE
 @usuario_bp.route("/update/<int:id>", methods=["PUT"])
 @token_required
-def update_usuario(current_user, id):  # ← Agregar 'id' como parámetro
+def update_usuario(current_user, id ):
+
     # Verificar que sea admin
     if current_user["rol"] != "admin":
         return jsonify({"error": "No autorizado"}), 403
     
     data = request.get_json()
-    
+
     # Validar que se enviaron datos
     if not data:
         return jsonify({"error": "No se proporcionaron datos"}), 400
     
     # Campos permitidos para actualizar
     campos_actualizables = ['nombre', 'apellido', 'username', 'rol', 'password']
+
+    #Campos para actualizar
     campos_a_actualizar = {}
     
     # Filtrar solo los campos permitidos
     for campo in campos_actualizables:
         if campo in data:
             campos_a_actualizar[campo] = data[campo]
-    
+
     # Validar que al menos un campo fue enviado
     if not campos_a_actualizar:
         return jsonify({"error": "No se proporcionaron campos válidos para actualizar"}), 400
-    
-    # Actualizar el usuario con el ID de la URL
-    usuario = UsuarioController.update_usuario(id, campos_a_actualizar)  # ← Usar 'id' de la ruta
+
+    usuario = UsuarioController.update_usuario(
+            data=campos_a_actualizar,
+            id_admin=current_user["id_usuario"], 
+            id_usuario=id
+        )
     
     if usuario:
         return jsonify({
             "mensaje": "Usuario actualizado correctamente",
-            "usuario": usuario.serializar(),
+            "id_usuario": usuario,
             "campos_actualizados": list(campos_a_actualizar.keys())
-        }), 200
+        }), 200    
     
     return jsonify({"error": "Usuario no encontrado o no se pudo actualizar"}), 404
 

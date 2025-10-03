@@ -52,32 +52,42 @@ class UsuarioService:
             return False
         
     @staticmethod
-    def update_usuario(id_usuario : int,nombre: str, apellido: str , username : str, rol: str, password : str , id_admin: int) -> int:
+    def update_usuario(id_usuario : int, id_admin: int, data : dict) -> int:
         
         #Verifica si el id corresponde a un usuario y lo devuelve
-        usuario = UsuarioDAO.read_one_usuario(id_admin)
-        if not usuario:
+        admin = UsuarioDAO.read_one_usuario(id_admin)
+        if not admin:
             raise Exception("Usuario no encontrado")
         
+        #verifica si el usuario a editar existe
+        usuario = UsuarioDAO.read_one_usuario(id_usuario)
+        if not usuario:
+            raise Exception("Usuario a editar no encontrado")
+        
         try:
-            permiso = PermisosDAO.validar_permisos(usuario , "update_usuario")
+            permiso = PermisosDAO.validar_permisos(admin , "update_usuario")
             if not permiso == 1:
                 raise Exception("permiso no encontrado")
             
-            id_nuevo_usuario = UsuarioDAO.update_usuario(id_usuario,nombre,apellido,username,rol,password)
-
-            if id_nuevo_usuario:
-
-                respuesta = AuditoriaService.registrar(
-                    entidad="usuario",
-                    id_entidad=id_usuario,
-                    accion="update",
-                    descripcion=f"Usuario : {usuario["username"]} modificó al usuario : {username}",
-                    id_admin=usuario["id_usuario"]
-                )
-                return respuesta
+            print("llega hasta aca")
             
+            for campo in data:
+                #evaluar = UsuarioDAO.update(id_usuario=id_usuario,data=campo)
+                print(campo)
 
+            # if evaluar:
+            #     respuesta = AuditoriaService.registrar(
+            #         entidad="usuario",
+            #         id_entidad=id_usuario,
+            #         accion="update",
+            #         descripcion=f"Usuario : {admin["username"]} modificó al usuario : {usuario["username"]}",
+            #         id_admin=admin["id_usuario"]
+            #     )
+            #     return respuesta
+            
+            print("no se ejecuta2")
+
+            return False
         except Exception as e:
 
             print(f"Error en update usuario_service : {e}")
