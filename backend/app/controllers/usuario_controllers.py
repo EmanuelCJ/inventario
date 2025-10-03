@@ -28,8 +28,17 @@ class UsuarioController:
             return False
     
     @staticmethod
-    def update_usuario():
-        pass
+    def update_usuario(data: dict, current_user: int):
+        
+        try:
+            respuesta = UsuarioService.update_usuario(
+                new_usuario=nuevo_usuario,
+                id_admin=current_user
+            )
+        except Exception as e:
+            print(f"Error al crear usuario nuevo controller: {e}")
+            return False
+        
     
     @staticmethod
     def delete_usuario():
