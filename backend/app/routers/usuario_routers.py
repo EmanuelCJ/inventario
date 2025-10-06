@@ -56,14 +56,28 @@ def update_usuario(current_user, id ):
             id_usuario=id
         )
     
-    if mensaje:
+    if mensaje.get("status") == True:
         return jsonify({
             "mensaje": "Usuario actualizado correctamente",
-            "id_usuario": mensaje,
+            "id_auditoria": mensaje,
             "campos_actualizados": list(campos_a_actualizar.keys())
         }), 200    
     
-    return jsonify({"status": mensaje}), 404
+    return jsonify(mensaje), 404
+
+# DELETE
+@usuario_bp.route("/delete/<int:id_usuario>", methods=["DELETE"])
+@token_required
+def delete_usuario(current_user,id_usuario):
+
+    # Verificar que sea admin
+    if current_user["rol"] != "admin":
+        return jsonify({"error": "No autorizado"}), 403
+    
+    success = UsuarioController.delete_usuario(id_admin=current_user,id_usuario=id_usuario)
+    if success:
+        return jsonify({"message": "usuario eliminado"}), 200
+    return jsonify({"error": "No se pudo eliminar el usuario"}), 400
 
 # READ ONE
 @usuario_bp.route("/search/<int:id_usuario>", methods=["GET"])
@@ -79,11 +93,3 @@ def get_usuarios_all():
     usuarios = UsuarioController.get_usuarios()
     return jsonify([p.to_dict() for p in usuarios]), 200
 
-
-# DELETE
-@usuario_bp.route("/delete/<int:id_usuario>", methods=["DELETE"])
-def delete_usuario(id_usuario):
-    success = UsuarioController.delete_usuario(id_usuario)
-    if success:
-        return jsonify({"message": "usuario eliminado"}), 200
-    return jsonify({"error": "No se pudo eliminar el usuario"}), 400

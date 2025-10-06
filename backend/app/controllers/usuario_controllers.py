@@ -45,8 +45,13 @@ class UsuarioController:
         
     
     @staticmethod
-    def delete_usuario():
-        pass
+    def delete_usuario(id_admin: int, id_usuario: int):
+        try:
+            respuesta = UsuarioService.delete_usuario(id_admin=id_admin, id_usuario=id_usuario)
+            return respuesta
+        except Exception as e:
+            print(f"Error al crear usuario nuevo controller: {e}")
+            return False
     
     @staticmethod
     def get_usuarios():

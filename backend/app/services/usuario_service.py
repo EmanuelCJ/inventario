@@ -1,6 +1,7 @@
 # service va la logica de negocio entre usuarios ejemplo crear, update, read, delete.
 from ..DAO.usuario_DAO import UsuarioDAO
 from ..DAO.permisos_DAO import PermisosDAO
+from ..utils.generation_password import hash_password
 from ..services.auditoria_service import AuditoriaService
 
 class UsuarioService:
@@ -77,6 +78,11 @@ class UsuarioService:
                 if bool(verificar_username) == True:
                     raise Exception(f"El username {data.get('username')} ya existe ")
             
+            #verfica si se quiere editar el password y encripta la nueva
+            if "password" in data:
+                password_encriptada = hash_password(password=data.get("password"))
+                data["password"] = password_encriptada
+            
             evaluar = UsuarioDAO.update(id_usuario=id_usuario, data=data)
                 
             if evaluar:
@@ -87,11 +93,11 @@ class UsuarioService:
                     descripcion=f"Usuario : <<{admin["username"]}>> modifico al usuario : <<{usuario["username"]}>> con los campos: {', '.join(data.keys())}",
                     id_admin=admin["id_usuario"]
                 )
-                return respuesta
+                return {f"status": True, "id_auditoria": respuesta}
             
         except Exception as e:
             print(f"Error en update usuario_service : {e}")
-            return False
+            return {f"status": False, "error": str(e)}
     
     @staticmethod
     def delete_usuario(id_admin: int, id_usuario: int):
@@ -110,7 +116,7 @@ class UsuarioService:
             #verifica si existe el usuario a eliminar
             usuario_eliminado = UsuarioDAO.read_one_usuario(id_usuario)
             if not usuario:
-                raise Exception("Usuario no encontrado")
+                raise Exception("Usuario a eiminar no encontrado")
 
             respuesta = UsuarioDAO.delete_usuario(id_usuario=id_usuario)
 

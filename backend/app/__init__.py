@@ -15,6 +15,6 @@ def create_app():
 
     @app.route("/")
     def home():
-        return "API Flask funcionando correctamente"
+        return "<div><h1>API REST con Flask</h1></div>"
     
     return app  
