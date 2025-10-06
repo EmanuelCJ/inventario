@@ -52,44 +52,44 @@ class UsuarioService:
             return False
         
     @staticmethod
-    def update_usuario(id_usuario : int, id_admin: int, data : dict) -> int:
-        
-        #Verifica si el id corresponde a un usuario y lo devuelve
-        admin = UsuarioDAO.read_one_usuario(id_admin)
-        if not admin:
-            raise Exception("Usuario no encontrado")
-        
-        #verifica si el usuario a editar existe
-        usuario = UsuarioDAO.read_one_usuario(id_usuario)
-        if not usuario:
-            raise Exception("Usuario a editar no encontrado")
+    def update_usuario(id_usuario : int, id_admin: int, data : dict) -> dict:
         
         try:
+
+            #Verifica si el id corresponde a un usuario y lo devuelve
+            admin = UsuarioDAO.read_one_usuario(id_admin)
+            if not admin:
+                raise Exception("Usuario no encontrado")
+        
+            #verifica si el usuario a editar existe
+            usuario = UsuarioDAO.read_one_usuario(id_usuario)
+            if not usuario:
+                raise Exception("Usuario a editar no encontrado")
+            
+            #verifica si el usuario tiene el permiso
             permiso = PermisosDAO.validar_permisos(admin , "update_usuario")
             if not permiso == 1:
                 raise Exception("permiso no encontrado")
             
-            print("llega hasta aca")
+            #verfica si el nombre usuario no esta repetido en la base
+            if "username" in data:
+                verificar_username = UsuarioDAO.username_exists(data.get("username"))
+                if bool(verificar_username) == True:
+                    raise Exception(f"El username {data.get('username')} ya existe ")
             
-            for campo in data:
-                #evaluar = UsuarioDAO.update(id_usuario=id_usuario,data=campo)
-                print(campo)
-
-            # if evaluar:
-            #     respuesta = AuditoriaService.registrar(
-            #         entidad="usuario",
-            #         id_entidad=id_usuario,
-            #         accion="update",
-            #         descripcion=f"Usuario : {admin["username"]} modificó al usuario : {usuario["username"]}",
-            #         id_admin=admin["id_usuario"]
-            #     )
-            #     return respuesta
+            evaluar = UsuarioDAO.update(id_usuario=id_usuario, data=data)
+                
+            if evaluar:
+                respuesta = AuditoriaService.registrar(
+                    entidad="usuario",
+                    id_entidad=id_usuario,
+                    accion="update",
+                    descripcion=f"Usuario : <<{admin["username"]}>> modifico al usuario : <<{usuario["username"]}>> con los campos: {', '.join(data.keys())}",
+                    id_admin=admin["id_usuario"]
+                )
+                return respuesta
             
-            print("no se ejecuta2")
-
-            return False
         except Exception as e:
-
             print(f"Error en update usuario_service : {e}")
             return False
     

@@ -50,20 +50,20 @@ def update_usuario(current_user, id ):
     if not campos_a_actualizar:
         return jsonify({"error": "No se proporcionaron campos válidos para actualizar"}), 400
 
-    usuario = UsuarioController.update_usuario(
+    mensaje = UsuarioController.update_usuario(
             data=campos_a_actualizar,
             id_admin=current_user["id_usuario"], 
             id_usuario=id
         )
     
-    if usuario:
+    if mensaje:
         return jsonify({
             "mensaje": "Usuario actualizado correctamente",
-            "id_usuario": usuario,
+            "id_usuario": mensaje,
             "campos_actualizados": list(campos_a_actualizar.keys())
         }), 200    
     
-    return jsonify({"error": "Usuario no encontrado o no se pudo actualizar"}), 404
+    return jsonify({"status": mensaje}), 404
 
 # READ ONE
 @usuario_bp.route("/search/<int:id_usuario>", methods=["GET"])

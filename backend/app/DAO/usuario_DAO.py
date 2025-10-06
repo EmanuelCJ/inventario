@@ -72,19 +72,19 @@ class UsuarioDAO:
     @staticmethod
     def update(id_usuario: int, data: dict) -> bool:
 
-        # Validar campos permitidos
-        campos_permitidos = ['nombre', 'apellido', 'username', 'rol', 'password']
-        for key in data.keys():
-            if key not in campos_permitidos:
-                raise ValueError(f"Campo no permitido para actualizar: {key}")
-    
-        # Validar que haya al menos un campo
-        if not data:
-            raise ValueError("No se proporcionaron campos para actualizar")
-    
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
             try:
+                # Validar campos permitidos
+                campos_permitidos = ['nombre', 'apellido', 'username', 'rol', 'password']
+                for key in data.keys():
+                 if key not in campos_permitidos:
+                    raise ValueError(f"Campo no permitido para actualizar: {key}")
+    
+                # Validar que haya al menos un campo
+                if not data:
+                    raise ValueError("No se proporcionaron campos para actualizar")
+                
                 # Construir la parte SET de la query dinámicamente
                 # Ejemplo: "nombre=%s, apellido=%s, rol=%s"
                 set_clause = ", ".join([f"{campo}=%s" for campo in data.keys()])
