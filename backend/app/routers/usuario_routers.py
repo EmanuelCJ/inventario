@@ -74,22 +74,26 @@ def delete_usuario(current_user,id_usuario):
     if current_user["rol"] != "admin":
         return jsonify({"error": "No autorizado"}), 403
     
-    success = UsuarioController.delete_usuario(id_admin=current_user,id_usuario=id_usuario)
+    success = UsuarioController.delete_usuario(id_admin=current_user["id_usuario"],id_usuario=id_usuario)
     if success:
         return jsonify({"message": "usuario eliminado"}), 200
     return jsonify({"error": "No se pudo eliminar el usuario"}), 400
 
 # READ ONE
-@usuario_bp.route("/search/<int:id_usuario>", methods=["GET"])
+@usuario_bp.route("/read/<int:id_usuario>", methods=["GET"])
+@token_required
 def get_usuarios_one(id_usuario):
-    usuario = UsuarioController.get_usuarios(id_usuario)
+    usuario = UsuarioController.all_usuarios(id_usuario)
     if usuario:
         return jsonify(usuario.to_dict()), 200
     return jsonify({"error": "Usuario no encontrado"}), 404
 
 # READ ALL
 @usuario_bp.route("/read", methods=["GET"])
+@token_required
 def get_usuarios_all():
-    usuarios = UsuarioController.get_usuarios()
-    return jsonify([p.to_dict() for p in usuarios]), 200
+    usuarios = UsuarioController.all_usuarios()
+    if usuarios is None:
+        return jsonify({"error": "No se pudieron obtener los usuarios"}), 400
+    return jsonify(usuarios), 200
 

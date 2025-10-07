@@ -38,7 +38,6 @@ class UsuarioDAO:
                 
     @staticmethod
     def read_all_user() -> dict | None:
-
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:
@@ -48,10 +47,12 @@ class UsuarioDAO:
                 usuarios = []
                 for row in rows:
                     usuarios.append(row)
-                return usuarios   
+                if usuarios :
+                    return usuarios
+                return None
             except Exception as e:
                 print(f"Error read usuarioDAO: {e}")
-                return None
+                return False
             finally:
                 connection.close()
                 

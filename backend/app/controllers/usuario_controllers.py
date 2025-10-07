@@ -54,9 +54,10 @@ class UsuarioController:
             return False
     
     @staticmethod
-    def get_usuarios():
-        pass
-    
-    @staticmethod
-    def get_usuarios():
-        pass
+    def all_usuarios()-> dict | None:
+        try:
+            usuarios = UsuarioService.get_usuarios()
+            return usuarios
+        except Exception as e:
+            print(f"Error al obtener usuarios controller: {e}")
+            return None

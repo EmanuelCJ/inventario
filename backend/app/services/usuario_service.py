@@ -105,7 +105,7 @@ class UsuarioService:
         #Verifica si el id corresponde a un usuario y lo devuelve
         usuario = UsuarioDAO.read_one_usuario(id_admin)
         if not usuario:
-            raise Exception("Usuario no encontrado")
+            raise Exception(f"Usuario con id {id_admin} no encontrado")
         
         permiso = PermisosDAO.validar_permisos(usuario , "delete_usuario")
         if not permiso == 1:
@@ -114,7 +114,7 @@ class UsuarioService:
         try:
             
             #verifica si existe el usuario a eliminar
-            usuario_eliminado = UsuarioDAO.read_one_usuario(id_usuario)
+            usuario_a_eliminar = UsuarioDAO.read_one_usuario(id_usuario)
             if not usuario:
                 raise Exception("Usuario a eiminar no encontrado")
 
@@ -125,7 +125,7 @@ class UsuarioService:
                     entidad="usuario",
                     id_entidad=id_usuario,
                     accion="delete",
-                    descripcion=f"Usuario : {usuario["username"]} elimino al usuario : {usuario_eliminado["username"]}",
+                    descripcion=f"Usuario : {usuario["username"]} elimino al usuario : {usuario_a_eliminar["username"]}",
                     id_admin=id_admin
                 )
             return True
@@ -135,8 +135,13 @@ class UsuarioService:
             return False
 
     @staticmethod
-    def read_usuario()->dict:
-        return UsuarioDAO.read_all_user()
+    def get_usuarios()->dict:
+        try:
+            usuarios = UsuarioDAO.read_all_user()
+            return usuarios
+        except Exception as e:
+            print(f"Error al obtener usuarios service: {e}")
+            return None
     
     @staticmethod
     def read_one_usuario(id_usuario: int) -> dict:
