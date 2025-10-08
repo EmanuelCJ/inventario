@@ -25,7 +25,7 @@ class AuthService:
 
         if not usuario.get("password"):
             return None
-
+        
         # Verificar contraseña
         if not check_password_hash(usuario.get("password"), password):
             print("❌ Contraseña incorrecta")
