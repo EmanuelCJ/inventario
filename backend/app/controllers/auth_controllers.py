@@ -5,8 +5,9 @@ class AuthControllers:
 
     @staticmethod
     def create_token(username: str , password: str):
+        
         token = AuthService.login(username, password)
-        if token:
+        if token is not None:
             return token
         return False
     
