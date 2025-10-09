@@ -1,7 +1,6 @@
 #DAO tiene la persistencia de datos y se comunica con la base de datos
-
 from ..db.conexion_DB import ConectDB
-from ..utils.generation_password import hash_password
+from werkzeug.security import generate_password_hash
 
 class UsuarioDAO:
     
@@ -16,7 +15,7 @@ class UsuarioDAO:
     def create_usuario(nombre: str,apellido: str,username:str,rol: str, password_hash: str) -> int | bool:
         
         #Este metodo encripta la password
-        password = hash_password(password=password_hash)
+        password = generate_password_hash(password=password_hash)
         
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:
@@ -121,7 +120,7 @@ class UsuarioDAO:
     def update_usuario( id_usuario : int, nombre: str, apellido: str , username : str, rol: str, contrasena : str) -> bool:
         
         #Este metodo encripta la password
-        password = hash_password(password=contrasena)
+        password = generate_password_hash(password=contrasena)
 
         connection = ConectDB.get_connection()
         with connection.cursor() as cursor:

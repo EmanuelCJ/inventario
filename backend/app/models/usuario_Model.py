@@ -1,5 +1,3 @@
-from werkzeug.security import generate_password_hash
-
 class UsuarioModel:
 
     def __init__(self, nombre: str, apellido: str,username :str, rol: str, password: str):
@@ -57,6 +55,6 @@ class UsuarioModel:
             apellido = data_usuario["apellido"],
             username= data_usuario["username"],
             rol = data_usuario["rol"],
-            password = generate_password_hash(data_usuario["password"])
+            password = data_usuario["password"]
         )
 
