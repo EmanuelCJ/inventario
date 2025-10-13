@@ -36,7 +36,7 @@ class UsuarioDAO:
                 connection.close()
                 
     @staticmethod
-    def read_all_user() -> dict | None:
+    def read_all_usuarios() -> dict | None:
         connection = ConectDB.get_connection()
         with connection.cursor(dictionary=True) as cursor:
             try:

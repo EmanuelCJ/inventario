@@ -82,17 +82,27 @@ def delete_usuario(current_user,id_usuario):
 # READ ONE
 @usuario_bp.route("/read/<int:id_usuario>", methods=["GET"])
 @token_required
-def get_usuarios_one(id_usuario):
-    usuario = UsuarioController.all_usuarios(id_usuario)
+def get_usuarios_one(current_user,id_usuario):
+
+    # Verificar que sea admin o editor
+    if current_user["rol"] != "admin" and current_user["rol"] != "editor":
+        return jsonify({"error": "No autorizado"}), 403
+    
+    usuario = UsuarioController.get_usuario(id_usuario)
     if usuario:
-        return jsonify(usuario.to_dict()), 200
+        return jsonify(usuario), 200
     return jsonify({"error": "Usuario no encontrado"}), 404
 
 # READ ALL
 @usuario_bp.route("/read", methods=["GET"])
 @token_required
-def get_usuarios_all():
-    usuarios = UsuarioController.all_usuarios()
+def get_usuarios_all(current_user):
+    
+    # Verificar que sea admin o editor
+    if current_user["rol"] != "admin" and current_user["rol"] != "editor":
+        return jsonify({"error": "No autorizado"}), 403
+    
+    usuarios = UsuarioController.get_usuarios()
     if usuarios is None:
         return jsonify({"error": "No se pudieron obtener los usuarios"}), 400
     return jsonify(usuarios), 200

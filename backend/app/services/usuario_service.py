@@ -137,7 +137,7 @@ class UsuarioService:
     @staticmethod
     def get_usuarios()->dict:
         try:
-            usuarios = UsuarioDAO.read_all_user()
+            usuarios = UsuarioDAO.read_all_usuarios()
             return usuarios
         except Exception as e:
             print(f"Error al obtener usuarios service: {e}")
