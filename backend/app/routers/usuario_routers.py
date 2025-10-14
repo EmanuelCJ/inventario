@@ -1,6 +1,10 @@
 from flask import Blueprint, request, jsonify
 from app.controllers.usuario_controllers import UsuarioController
 from ..utils.validacion_token import token_required
+from ..interfaces.usuario_interfaz import UsuarioShema
+from pydantic import ValidationError
+
+
 
 
 usuario_bp = Blueprint("usuario_bp", __name__)
@@ -8,17 +12,42 @@ usuario_bp = Blueprint("usuario_bp", __name__)
 # CREATE
 @usuario_bp.route("/create", methods=["POST"])
 @token_required
-def create_usuario(current_user):   # payload inyectado aca
+def create_usuario(current_user):
+    
     if current_user["rol"] != "admin":
         return jsonify({"error": "No autorizado"}), 403
-    
+
     data = request.get_json()
-    usuario = UsuarioController.create_usuario(data, current_user["id_usuario"])
-    
-    if usuario:
-        return jsonify(usuario.serializar()), 201
-    
-    return jsonify({"error": "No se pudo crear el usuario"}), 400
+
+    try:
+        
+        validacion = UsuarioShema(**data)
+        # data_validado = validacion.model_dump()
+        # print("Datos validados:", data_validado)
+
+        # usuario = UsuarioController.create_usuario(data, current_user["id_usuario"])
+        
+        # if usuario:
+        #    return jsonify({
+        #         "mensaje": "Validación exitosa",
+        #         "usuario": usuario.serializar()
+        #         }), 200
+        
+        # return jsonify({"error": "No se pudo crear el usuario"}), 400
+
+    except ValidationError as e:
+        errores = e.errors()
+        print("Errores de validación:")
+        for err in errores:
+            print(f"Campo: {err['loc'][0]}, Error: {err['msg']}")
+        return jsonify({"errores": errores}), 400
+
+    except Exception as e:
+        print(f"Error en la ruta create usuario: {e}")
+        return jsonify({"error": "Error interno del servidor"}), 500
+
+
+        
 
 # UPDATE
 @usuario_bp.route("/update/<int:id>", methods=["PUT"])
