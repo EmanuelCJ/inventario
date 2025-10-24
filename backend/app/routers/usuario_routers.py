@@ -1,53 +1,66 @@
 from flask import Blueprint, request, jsonify
 from app.controllers.usuario_controllers import UsuarioController
 from ..utils.validacion_token import token_required
-from ..interfaces.usuario_interfaz import UsuarioShema
+from ..interfaces.usuario_interfaz import UserInterface 
 from pydantic import ValidationError
-
-
-
+from flask import jsonify, request
 
 usuario_bp = Blueprint("usuario_bp", __name__)
 
+# CREATE
 # CREATE
 @usuario_bp.route("/create", methods=["POST"])
 @token_required
 def create_usuario(current_user):
     
+    # 1. Autorización: Solo el administrador puede crear usuarios
     if current_user["rol"] != "admin":
         return jsonify({"error": "No autorizado"}), 403
 
     data = request.get_json()
 
+    # Si no se recibe JSON o está vacío
+    if not data:
+        return jsonify({"error": "Se requiere enviar datos en formato JSON"}), 400
+
     try:
         
-        validacion = UsuarioShema(**data)
-        # data_validado = validacion.model_dump()
-        # print("Datos validados:", data_validado)
+        # 2. VALIDACIÓN CON PYDANTIC
+        # Intentamos pasar los datos recibidos (dict) a nuestro modelo UserInterface.
+        # Esto valida tipos, campos requeridos y ejecuta todos los @field_validator.
+        usuario_validado = UserInterface(**data)
 
-        # usuario = UsuarioController.create_usuario(data, current_user["id_usuario"])
+        # Opcional: convertir el objeto Pydantic validado de nuevo a un dict de Python
+        # para pasarlo a la capa de controlador/modelo si esta lo espera.
+        datos_usuario = usuario_validado.model_dump()
         
-        # if usuario:
-        #    return jsonify({
-        #         "mensaje": "Validación exitosa",
-        #         "usuario": usuario.serializar()
-        #         }), 200
+        # 3. Lógica de negocio (Controller)
+        # Pasamos los datos ya validados y limpios.
+        usuario = UsuarioController.create_usuario(datos_usuario, current_user["id_usuario"]) 
         
-        # return jsonify({"error": "No se pudo crear el usuario"}), 400
+        if usuario:
+           return jsonify({
+                "mensaje": "Usuario creado exitosamente",
+                "usuario": usuario.serializar()
+                }), 201 # Se usa 201 Created para indicar la creación exitosa
+        
+        return jsonify({"error": "No se pudo crear el usuario (posiblemente un dato único duplicado)"}), 400
 
+    # Captura específica de errores de validación de Pydantic
     except ValidationError as e:
-        errores = e.errors()
-        print("Errores de validación:")
-        for err in errores:
-            print(f"Campo: {err['loc'][0]}, Error: {err['msg']}")
-        return jsonify({"errores": errores}), 400
+        # Pydantic devuelve errores detallados que podemos mostrar al usuario
+        # para que sepa exactamente qué campo falló.
+        detalles_error = e.errors() 
+        return jsonify({
+            "error": "Error de validación de datos",
+            "detalles": detalles_error
+        }), 422 # 422 Unprocessable Entity es común para errores de validación
 
+    # Captura otros errores (Base de Datos, lógica de negocio no capturada, etc.)
     except Exception as e:
         print(f"Error en la ruta create usuario: {e}")
         return jsonify({"error": "Error interno del servidor"}), 500
 
-
-        
 
 # UPDATE
 @usuario_bp.route("/update/<int:id>", methods=["PUT"])

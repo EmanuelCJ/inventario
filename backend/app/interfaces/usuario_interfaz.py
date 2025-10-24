@@ -1,17 +1,31 @@
-from pydantic import BaseModel, Field, field_validator
-from typing import Literal
+from pydantic import BaseModel, field_validator, ValidationError
+import re
 
-class UsuarioShema(BaseModel):
-    username: str = Field(..., min_length=3, max_length=20)
-    nombre: str = Field(..., min_length=2)
-    apellido: str = Field(..., min_length=2)
-    rol: Literal["admin", "editor", "visor"]
-    password: str = Field(..., min_length=8)
+# Patrón básico para detectar inyecciones SQL
+# Esto es una simplificación; la forma más segura es usar consultas parametrizadas.
+SQL_INJECTION_PATTERN = re.compile(r"(--|drop\s+table|delete\s+from|select\s+.*?\s+from)", re.IGNORECASE)
 
-    @field_validator("password")
-    def validar_password_segura(cls, value):
-        if not any(char.isdigit() for char in value):
-            raise ValueError("La contraseña debe contener al menos un número.")
-        if not any(char.isupper() for char in value):
-            raise ValueError("La contraseña debe contener al menos una mayúscula.")
+class UserInterface(BaseModel):
+    """Define la estructura y reglas de validación para un objeto Usuario."""
+    nombre: str
+    apellido: str
+    username: str
+    rol: str
+    password: str
+
+    @field_validator('nombre', 'apellido', 'username', 'rol')
+    @classmethod
+    def check_for_sql_injection(cls, value):
+        """Valida que los campos de texto no contengan posibles inyecciones SQL."""
+        if SQL_INJECTION_PATTERN.search(value):
+            raise ValueError(f"El campo contiene texto prohibido (posible inyección SQL): '{value}'")
+        return value
+
+    @field_validator('rol')
+    @classmethod
+    def check_valid_role(cls, value):
+        """Valida que el campo 'rol' solo contenga valores permitidos."""
+        valid_roles = {"editor", "administrador", "viewer"}
+        if value not in valid_roles:
+            raise ValueError(f"El valor de 'rol' debe ser uno de: {valid_roles}")
         return value
