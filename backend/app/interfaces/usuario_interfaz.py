@@ -25,7 +25,7 @@ class UserInterface(BaseModel):
     @classmethod
     def check_valid_role(cls, value):
         """Valida que el campo 'rol' solo contenga valores permitidos."""
-        valid_roles = {"editor", "administrador", "viewer"}
+        valid_roles = {"editor", "administrador", "visor"}
         if value not in valid_roles:
             raise ValueError(f"El valor de 'rol' debe ser uno de: {valid_roles}")
         return value

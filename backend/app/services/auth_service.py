@@ -19,9 +19,9 @@ class AuthService:
         if not usuario:
             return None
 
-        print(f"Usuario encontrado: {usuario}")
-        print(f"Password hash en DB: {usuario.get('password')}")
-        print(f"Password ingresada: {password}")
+        # print(f"Usuario encontrado: {usuario}")
+        # print(f"Password hash en DB: {usuario.get('password')}")
+        # print(f"Password ingresada: {password}")
 
         if not usuario.get("password"):
             return None
@@ -44,7 +44,7 @@ class AuthService:
         if isinstance(token, bytes):
             token = token.decode("utf-8")
 
-        print("✅ Token generado:", token)
+        #print("✅ Token generado:", token)
         return token
 
     @staticmethod

@@ -8,7 +8,6 @@ from flask import jsonify, request
 usuario_bp = Blueprint("usuario_bp", __name__)
 
 # CREATE
-# CREATE
 @usuario_bp.route("/create", methods=["POST"])
 @token_required
 def create_usuario(current_user):
@@ -22,21 +21,18 @@ def create_usuario(current_user):
     # Si no se recibe JSON o está vacío
     if not data:
         return jsonify({"error": "Se requiere enviar datos en formato JSON"}), 400
-
+    
+    
     try:
-        
-        # 2. VALIDACIÓN CON PYDANTIC
-        # Intentamos pasar los datos recibidos (dict) a nuestro modelo UserInterface.
-        # Esto valida tipos, campos requeridos y ejecuta todos los @field_validator.
+        #validacion de datos con interface pydantic
         usuario_validado = UserInterface(**data)
-
-        # Opcional: convertir el objeto Pydantic validado de nuevo a un dict de Python
-        # para pasarlo a la capa de controlador/modelo si esta lo espera.
+        
+        #validar y sanitizar datos (Interface)
         datos_usuario = usuario_validado.model_dump()
         
         # 3. Lógica de negocio (Controller)
         # Pasamos los datos ya validados y limpios.
-        usuario = UsuarioController.create_usuario(datos_usuario, current_user["id_usuario"]) 
+        usuario = UsuarioController.create_usuario(datos_usuario, current_user["id_usuario"])
         
         if usuario:
            return jsonify({
@@ -47,19 +43,19 @@ def create_usuario(current_user):
         return jsonify({"error": "No se pudo crear el usuario (posiblemente un dato único duplicado)"}), 400
 
     # Captura específica de errores de validación de Pydantic
-    except ValidationError as e:
+    except ValidationError as a:
         # Pydantic devuelve errores detallados que podemos mostrar al usuario
         # para que sepa exactamente qué campo falló.
-        detalles_error = e.errors() 
+        detalles_error = a.errors() 
         return jsonify({
             "error": "Error de validación de datos",
-            "detalles": detalles_error
+            "detalles": str(detalles_error)
         }), 422 # 422 Unprocessable Entity es común para errores de validación
 
-    # Captura otros errores (Base de Datos, lógica de negocio no capturada, etc.)
+    #Captura otros errores (Base de Datos, lógica de negocio no capturada, etc.)
     except Exception as e:
         print(f"Error en la ruta create usuario: {e}")
-        return jsonify({"error": "Error interno del servidor"}), 500
+        return jsonify({"error": "Error interno del servidor"}), 400
 
 
 # UPDATE
