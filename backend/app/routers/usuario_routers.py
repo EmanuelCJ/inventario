@@ -73,36 +73,50 @@ def update_usuario(current_user, id ):
     if not data:
         return jsonify({"error": "No se proporcionaron datos"}), 400
     
-    # Campos permitidos para actualizar
-    campos_actualizables = ['nombre', 'apellido', 'username', 'rol', 'password']
-
-    #Campos para actualizar
-    campos_a_actualizar = {}
     
-    # Filtrar solo los campos permitidos
-    for campo in campos_actualizables:
-        if campo in data:
-            campos_a_actualizar[campo] = data[campo]
+    try:
+            # Campos permitidos para actualizar
+        campos_actualizables = ['nombre', 'apellido', 'username', 'rol', 'password']
 
-    # Validar que al menos un campo fue enviado
-    if not campos_a_actualizar:
-        return jsonify({"error": "No se proporcionaron campos válidos para actualizar"}), 400
-
-    mensaje = UsuarioController.update_usuario(
-            data=campos_a_actualizar,
-            id_admin=current_user["id_usuario"], 
-            id_usuario=id
-        )
+        #Campos para actualizar
+        campos_a_actualizar = {}
     
-    if mensaje.get("status") == True:
+        # Filtrar solo los campos permitidos
+        for campo in campos_actualizables:
+            if campo in data:
+                campos_a_actualizar[campo] = data[campo]
+
+        # Validar que al menos un campo fue enviado
+        if not campos_a_actualizar:
+            return jsonify({"error": "No se proporcionaron campos válidos para actualizar"}), 400
+
+        mensaje = UsuarioController.update_usuario(
+                data=campos_a_actualizar,
+                id_admin=current_user["id_usuario"], 
+                id_usuario=id
+            )
+    
+        if mensaje.get("status") == True:
+            return jsonify({
+                "mensaje": "Usuario actualizado correctamente",
+                "id_auditoria": mensaje,
+                "campos_actualizados": list(campos_a_actualizar.keys())
+            }), 200    
+    
+        return jsonify(mensaje), 404
+    
+    except ValidationError as a:
+        # Pydantic devuelve errores detallados que podemos mostrar al usuario
+        # para que sepa exactamente qué campo falló.
+        detalles_error = a.errors() 
         return jsonify({
-            "mensaje": "Usuario actualizado correctamente",
-            "id_auditoria": mensaje,
-            "campos_actualizados": list(campos_a_actualizar.keys())
-        }), 200    
+            "error": "Error de validación de datos",
+            "detalles": str(detalles_error)
+        }), 422 # 422 Unprocessable Entity es común para errores de validación
+    except Exception as e:
+        print(f"Error en la ruta update usuario: {e}")
+        return jsonify({"error": "Error interno del servidor"}), 400
     
-    return jsonify(mensaje), 404
-
 # DELETE
 @usuario_bp.route("/delete/<int:id_usuario>", methods=["DELETE"])
 @token_required
