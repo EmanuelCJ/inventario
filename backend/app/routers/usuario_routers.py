@@ -113,6 +113,7 @@ def update_usuario(current_user, id ):
             "error": "Error de validación de datos",
             "detalles": str(detalles_error)
         }), 422 # 422 Unprocessable Entity es común para errores de validación
+        
     except Exception as e:
         print(f"Error en la ruta update usuario: {e}")
         return jsonify({"error": "Error interno del servidor"}), 400
