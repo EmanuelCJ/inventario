@@ -37,3 +37,9 @@ def protegido():
         return jsonify({"error": "Token inválido o expirado"}), 401
 
     return jsonify({"msg": "Acceso concedido", "datos": payload}), 200
+
+@auth_bp.route("/", methods=["GET"])
+def aviso():
+    
+    return "<div><h1>Aplicacion Api REST introduzca usuario y contraseña</h1></div>"
+

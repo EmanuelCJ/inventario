@@ -22,7 +22,6 @@ def create_usuario(current_user):
     if not data:
         return jsonify({"error": "Se requiere enviar datos en formato JSON"}), 400
     
-    
     try:
         #validacion de datos con interface pydantic
         usuario_validado = UserInterface(**data)

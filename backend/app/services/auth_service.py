@@ -15,13 +15,11 @@ class AuthService:
 
     @staticmethod
     def login(username, password):
+
+        # Buscar usuario en la base de datos
         usuario = UsuarioDAO.search_username(username)
         if not usuario:
             return None
-
-        # print(f"Usuario encontrado: {usuario}")
-        # print(f"Password hash en DB: {usuario.get('password')}")
-        # print(f"Password ingresada: {password}")
 
         if not usuario.get("password"):
             return None
