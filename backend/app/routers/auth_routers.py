@@ -15,15 +15,39 @@ def login():
     username = data["username"]
     password = data["password"]
 
-    token = AuthControllers.create_token(username, password)
+    tokens = AuthControllers.create_token(username, password)
     
-    if token:
-        return jsonify({"token": token}), 200
+    if tokens is not None:
+        
+        resp = jsonify({"ok": True})
+
+        token_access = tokens["access_token"]
+        token_refresh = tokens["refresh_token"]
+
+        resp.set_cookie(
+            "access_token",
+            token_access,
+            httponly=True,
+            secure=True,
+            samesite="Strict",
+            max_age=1800  # 30 min
+        )
+
+        resp.set_cookie(
+            "refresh_token",
+            token_refresh,
+            httponly=True,
+            secure=True,
+            samesite="Strict",
+            max_age=604800  # 7 días
+        )
+
+        return resp
+
     else:
         return jsonify({"error": "Credenciales inválidas"}), 401
 
-
-
+# verifica el token enviado en headers (borrar s)
 @auth_bp.route("/protegido", methods=["GET"])
 def protegido():
     
@@ -40,6 +64,5 @@ def protegido():
 
 @auth_bp.route("/", methods=["GET"])
 def aviso():
-    
     return "<div><h1>Aplicacion Api REST introduzca usuario y contraseña</h1></div>"
 

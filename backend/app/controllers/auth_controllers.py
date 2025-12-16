@@ -6,9 +6,14 @@ class AuthControllers:
     @staticmethod
     def create_token(username: str , password: str):
         
-        token = AuthService.login(username, password)
-        if token is not None:
-            return token
+        usuario_autenticado = AuthService.login(username, password)
+        if usuario_autenticado is not None:
+            token_access = AuthService.create_access_token(usuario_autenticado)
+            token_refresh = AuthService.create_refresh_token(usuario_autenticado)
+            return {
+                "access_token": token_access,
+                "refresh_token": token_refresh
+            }
         return False
     
     @staticmethod

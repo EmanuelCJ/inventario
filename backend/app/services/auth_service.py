@@ -29,21 +29,7 @@ class AuthService:
             print("❌ Contraseña incorrecta")
             return None
 
-        # Crear payload del token
-        payload = {
-            "id_usuario": usuario["id_usuario"],
-            "rol": usuario["rol"],
-            "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
-        }
-
-        print(f"Token expira: {payload['exp']}")
-
-        token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
-        if isinstance(token, bytes):
-            token = token.decode("utf-8")
-
-        #print("✅ Token generado:", token)
-        return token
+        return usuario
 
     @staticmethod
     def verificar_token(token):
@@ -57,3 +43,24 @@ class AuthService:
         except jwt.InvalidTokenError:
             print("❌ Token inválido")
             return None
+
+    #CREACION DE TOKENS DE ACCESO 
+    @staticmethod
+    def create_access_token(usuario):
+        payload = {
+            "id_usuario": usuario["id_usuario"],
+            "rol": usuario["rol"],
+            "type": "access",
+            "exp": datetime.now(timezone.utc) + timedelta(minutes=30)
+        }
+        return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    
+    #CREACION DE TOKENS DE REFRESH
+    @staticmethod
+    def create_refresh_token(usuario):
+        payload = {
+            "id_usuario": usuario["id_usuario"],
+            "type": "refresh",
+            "exp": datetime.now(timezone.utc) + timedelta(days=7)
+        }
+        return jwt.encode(payload, SECRET_KEY, algorithm="HS256")

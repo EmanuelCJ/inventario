@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.controllers.usuario_controllers import UsuarioController
-from ..utils.validacion_token import token_required
+from ..utils.docoradores_auth import token_required
 from ..interfaces.usuario_interfaz import UserInterface 
 from pydantic import ValidationError
 from flask import jsonify, request
