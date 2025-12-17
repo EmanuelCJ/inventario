@@ -1,51 +1,48 @@
 # controllers/auth_controller.py
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from ..controllers.auth_controllers import AuthControllers
+import os
+
+#importar variables de entorno
+IS_PROD = os.getenv("FLASK_ENV") == "production"
 
 auth_bp = Blueprint("auth_bp", __name__)
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
-    
     data = request.get_json()
-    
+
     if not data or "username" not in data or "password" not in data:
-        return jsonify({"error": "Faltan datos"}), 400
-    
-    username = data["username"]
-    password = data["password"]
+        return {"error": "Faltan datos"}, 400
 
-    tokens = AuthControllers.create_token(username, password)
-    
-    if tokens is not None:
-        
-        resp = jsonify({"ok": True})
+    tokens = AuthControllers.create_token(
+        data["username"], data["password"]
+    )
 
-        token_access = tokens["access_token"]
-        token_refresh = tokens["refresh_token"]
+    if not tokens:
+        return {"error": "Credenciales inválidas"}, 401
 
-        resp.set_cookie(
-            "access_token",
-            token_access,
-            httponly=True,
-            secure=True,
-            samesite="Strict",
-            max_age=1800  # 30 min
-        )
+    resp = make_response({"ok": True})
 
-        resp.set_cookie(
-            "refresh_token",
-            token_refresh,
-            httponly=True,
-            secure=True,
-            samesite="Strict",
-            max_age=604800  # 7 días
-        )
+    resp.set_cookie(
+        "access_token",
+        tokens["access_token"],
+        httponly=True,
+        secure=IS_PROD,
+        samesite="Strict" if IS_PROD else "Lax",
+        max_age=1800
+    )
 
-        return resp
+    resp.set_cookie(
+        "refresh_token",
+        tokens["refresh_token"],
+        httponly=True,
+        secure=IS_PROD,
+        samesite="Strict" if IS_PROD else "Lax",
+        max_age=604800
+    )
 
-    else:
-        return jsonify({"error": "Credenciales inválidas"}), 401
+    return resp
 
 # verifica el token enviado en headers (borrar s)
 @auth_bp.route("/protegido", methods=["GET"])
